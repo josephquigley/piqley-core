@@ -19,10 +19,6 @@ struct HookTests {
         #expect(Hook.publish.rawValue == "publish")
     }
 
-    @Test func rawValueSchedule() {
-        #expect(Hook.schedule.rawValue == "schedule")
-    }
-
     @Test func rawValuePostPublish() {
         #expect(Hook.postPublish.rawValue == "post-publish")
     }
@@ -58,13 +54,13 @@ struct HookTests {
     // MARK: - allCases count
 
     @Test func allCasesCount() {
-        #expect(Hook.allCases.count == 5)
+        #expect(Hook.allCases.count == 4)
     }
 
     // MARK: - canonicalOrder
 
     @Test func canonicalOrderLength() {
-        #expect(Hook.canonicalOrder.count == 5)
+        #expect(Hook.canonicalOrder.count == 4)
     }
 
     @Test func canonicalOrderSequence() {
@@ -72,7 +68,6 @@ struct HookTests {
             .preProcess,
             .postProcess,
             .publish,
-            .schedule,
             .postPublish
         ])
     }
