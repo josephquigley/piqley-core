@@ -8,6 +8,12 @@
   Shared types and protocols for the <a href="https://github.com/josephquigley/piqley-cli">piqley</a> ecosystem.
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white" alt="Swift 6.0"/>
+  <img src="https://img.shields.io/badge/Platforms-macOS%20%7C%20Linux-blue" alt="Platforms"/>
+  <img src="https://img.shields.io/github/license/josephquigley/piqley-core" alt="License"/>
+</p>
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I2LL7Y1)
 ---
 
