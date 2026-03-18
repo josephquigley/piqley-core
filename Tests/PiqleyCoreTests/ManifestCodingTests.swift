@@ -80,4 +80,79 @@ struct ManifestCodingTests {
         #expect(secretKey == "API_TOKEN")
         #expect(type_ == .string)
     }
+
+    // MARK: - HookConfig
+
+    @Test func decodeFullHookConfig() throws {
+        let json = """
+        {
+            "command": "/usr/bin/plugin",
+            "args": ["--verbose", "--output", "json"],
+            "timeout": 30,
+            "protocol": "json",
+            "successCodes": [0],
+            "warningCodes": [1],
+            "criticalCodes": [2, 3],
+            "batchProxy": {}
+        }
+        """
+        let hook = try JSONDecoder().decode(HookConfig.self, from: Data(json.utf8))
+        #expect(hook.command == "/usr/bin/plugin")
+        #expect(hook.args == ["--verbose", "--output", "json"])
+        #expect(hook.timeout == 30)
+        #expect(hook.pluginProtocol == .json)
+        #expect(hook.successCodes == [0])
+        #expect(hook.warningCodes == [1])
+        #expect(hook.criticalCodes == [2, 3])
+        #expect(hook.batchProxy != nil)
+    }
+
+    @Test func decodeMinimalHookConfig() throws {
+        let json = "{}"
+        let hook = try JSONDecoder().decode(HookConfig.self, from: Data(json.utf8))
+        #expect(hook.command == nil)
+        #expect(hook.args == [])
+        #expect(hook.timeout == nil)
+        #expect(hook.pluginProtocol == nil)
+        #expect(hook.successCodes == nil)
+        #expect(hook.warningCodes == nil)
+        #expect(hook.criticalCodes == nil)
+        #expect(hook.batchProxy == nil)
+    }
+
+    // MARK: - SetupConfig
+
+    @Test func decodeSetupConfigWithArgs() throws {
+        let json = #"{"command": "setup.sh", "args": ["--init"]}"#
+        let setup = try JSONDecoder().decode(SetupConfig.self, from: Data(json.utf8))
+        #expect(setup.command == "setup.sh")
+        #expect(setup.args == ["--init"])
+    }
+
+    @Test func decodeSetupConfigWithoutArgs() throws {
+        let json = #"{"command": "setup.sh"}"#
+        let setup = try JSONDecoder().decode(SetupConfig.self, from: Data(json.utf8))
+        #expect(setup.command == "setup.sh")
+        #expect(setup.args == [])
+    }
+
+    // MARK: - BatchProxyConfig
+
+    @Test func decodeBatchProxyWithSort() throws {
+        let json = #"{"sort": {"key": "date", "order": "ascending"}}"#
+        let proxy = try JSONDecoder().decode(BatchProxyConfig.self, from: Data(json.utf8))
+        #expect(proxy.sort?.key == "date")
+        #expect(proxy.sort?.order == .ascending)
+    }
+
+    @Test func decodeBatchProxyWithoutSort() throws {
+        let json = "{}"
+        let proxy = try JSONDecoder().decode(BatchProxyConfig.self, from: Data(json.utf8))
+        #expect(proxy.sort == nil)
+    }
+
+    @Test func sortOrderRawValues() {
+        #expect(SortOrder.ascending.rawValue == "ascending")
+        #expect(SortOrder.descending.rawValue == "descending")
+    }
 }
