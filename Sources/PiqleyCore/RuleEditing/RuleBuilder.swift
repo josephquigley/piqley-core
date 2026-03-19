@@ -77,7 +77,7 @@ public struct RuleBuilder: Sendable {
         guard let match else {
             return .failure(.noMatch)
         }
-        guard !emitActions.isEmpty else {
+        guard !emitActions.isEmpty || !writeActions.isEmpty else {
             return .failure(.noActions)
         }
         return .success(Rule(match: match, emit: emitActions, write: writeActions))

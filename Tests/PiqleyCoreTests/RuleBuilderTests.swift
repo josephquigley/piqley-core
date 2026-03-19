@@ -157,12 +157,18 @@ struct RuleBuilderTests {
         #expect(isBuildFailure(result, .noActions))
     }
 
-    @Test func buildWithWriteOnlyAlsoFailsNoActions() {
+    @Test func buildWithWriteOnlySucceeds() {
         var builder = RuleBuilder(context: makeContext())
         _ = builder.setMatch(field: "Keywords", pattern: "portrait")
         _ = builder.addWrite(makeEmit(action: "removeField", field: "ISO", values: nil))
         let result = builder.build()
-        #expect(isBuildFailure(result, .noActions))
+        if case .success(let rule) = result {
+            #expect(rule.emit.isEmpty)
+            #expect(rule.write.count == 1)
+            #expect(rule.write[0].field == "ISO")
+        } else {
+            Issue.record("Expected .success for write-only rule, got \(result)")
+        }
     }
 
     // MARK: - reset
