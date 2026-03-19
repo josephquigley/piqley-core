@@ -39,7 +39,7 @@ dependencies: [
 ## Related
 
 - [piqley-cli](https://github.com/josephquigley/piqley-cli) — CLI for photo publishing workflows
-- [piqley-plugin-sdk](https://github.com/josephquigley/piqley-cli-plugin-sdk) — Libraries for building piqley plugins
+- [piqley-plugin-sdk](https://github.com/josephquigley/piqley-plugin-sdk) — Libraries for building piqley plugins
 
 ## License
 
