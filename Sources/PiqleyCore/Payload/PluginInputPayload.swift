@@ -2,8 +2,8 @@
 public struct PluginInputPayload: Codable, Sendable, Equatable {
     /// The hook stage being executed.
     public let hook: String
-    /// The path to the folder being processed.
-    public let folderPath: String
+    /// The path to the image folder being processed.
+    public let imageFolderPath: String
     /// The key-value configuration for this plugin instance.
     public let pluginConfig: [String: JSONValue]
     /// Secret values resolved from environment variables.
@@ -25,7 +25,7 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
 
     public init(
         hook: String,
-        folderPath: String,
+        imageFolderPath: String,
         pluginConfig: [String: JSONValue],
         secrets: [String: String],
         executionLogPath: String,
@@ -37,7 +37,7 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
         lastExecutedVersion: SemanticVersion?
     ) {
         self.hook = hook
-        self.folderPath = folderPath
+        self.imageFolderPath = imageFolderPath
         self.pluginConfig = pluginConfig
         self.secrets = secrets
         self.executionLogPath = executionLogPath

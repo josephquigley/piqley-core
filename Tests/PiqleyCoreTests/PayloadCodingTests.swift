@@ -10,7 +10,7 @@ struct PayloadCodingTests {
     @Test func encodeDecodeInputPayload() throws {
         let payload = PluginInputPayload(
             hook: "pre-process",
-            folderPath: "/data/folder",
+            imageFolderPath: "/data/folder",
             pluginConfig: ["apiUrl": .string("https://example.com")],
             secrets: ["API_TOKEN": "secret123"],
             executionLogPath: "/logs/exec.log",
@@ -24,7 +24,7 @@ struct PayloadCodingTests {
         let data = try JSONEncoder().encode(payload)
         let decoded = try JSONDecoder().decode(PluginInputPayload.self, from: data)
         #expect(decoded.hook == "pre-process")
-        #expect(decoded.folderPath == "/data/folder")
+        #expect(decoded.imageFolderPath == "/data/folder")
         #expect(decoded.pluginConfig["apiUrl"] == .string("https://example.com"))
         #expect(decoded.secrets["API_TOKEN"] == "secret123")
         #expect(decoded.executionLogPath == "/logs/exec.log")
@@ -44,7 +44,7 @@ struct PayloadCodingTests {
         ]
         let payload = PluginInputPayload(
             hook: "post-process",
-            folderPath: "/data/folder",
+            imageFolderPath: "/data/folder",
             pluginConfig: [:],
             secrets: [:],
             executionLogPath: "/logs/exec.log",
