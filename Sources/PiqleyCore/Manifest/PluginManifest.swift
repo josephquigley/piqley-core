@@ -5,7 +5,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
     public let pluginVersion: SemanticVersion?
     public let config: [ConfigEntry]
     public let setup: SetupConfig?
-    public let dependencies: [String]?
+    public let dependencies: [PluginDependency]?
     public let hooks: [String: HookConfig]
 
     public init(
@@ -14,7 +14,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         pluginVersion: SemanticVersion? = nil,
         config: [ConfigEntry] = [],
         setup: SetupConfig? = nil,
-        dependencies: [String]? = nil,
+        dependencies: [PluginDependency]? = nil,
         hooks: [String: HookConfig] = [:]
     ) {
         self.name = name
@@ -43,8 +43,21 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         pluginVersion = try container.decodeIfPresent(SemanticVersion.self, forKey: .pluginVersion)
         config = try container.decodeIfPresent([ConfigEntry].self, forKey: .config) ?? []
         setup = try container.decodeIfPresent(SetupConfig.self, forKey: .setup)
-        dependencies = try container.decodeIfPresent([String].self, forKey: .dependencies)
+        if let structured = try? container.decodeIfPresent([PluginDependency].self, forKey: .dependencies) {
+            dependencies = structured
+        } else if let names = try? container.decodeIfPresent([String].self, forKey: .dependencies) {
+            dependencies = names.map { PluginDependency(name: $0) }
+        } else {
+            dependencies = nil
+        }
         hooks = try container.decodeIfPresent([String: HookConfig].self, forKey: .hooks) ?? [:]
+    }
+
+    /// The dependency identifiers as plain strings (for backward-compatible pipeline resolution).
+    ///
+    /// Returns each dependency's ``PluginDependency/identifier`` (name if present, otherwise URL).
+    public var dependencyNames: [String] {
+        dependencies?.map(\.identifier) ?? []
     }
 
     /// The secret environment variable keys declared in config.

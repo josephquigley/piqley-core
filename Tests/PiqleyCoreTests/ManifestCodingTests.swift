@@ -181,7 +181,8 @@ struct ManifestCodingTests {
         #expect(manifest.pluginVersion == SemanticVersion(major: 2, minor: 3, patch: 1))
         #expect(manifest.config.count == 2)
         #expect(manifest.setup?.command == "setup.sh")
-        #expect(manifest.dependencies == ["other-plugin"])
+        #expect(manifest.dependencies?.count == 1)
+        #expect(manifest.dependencyNames == ["other-plugin"])
         #expect(manifest.hooks["pre-process"] != nil)
     }
 
