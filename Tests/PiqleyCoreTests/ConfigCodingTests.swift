@@ -169,7 +169,7 @@ struct ConfigCodingTests {
 
     // MARK: - PluginConfig
 
-    @Test func decodePluginConfigWithRules() throws {
+    @Test func decodePluginConfigIgnoresLegacyRules() throws {
         let json = """
         {
             "values": {"apiUrl": "https://example.com", "retries": 3},
@@ -186,7 +186,6 @@ struct ConfigCodingTests {
         #expect(config.values["apiUrl"] == .string("https://example.com"))
         #expect(config.values["retries"] == .number(3))
         #expect(config.isSetUp == true)
-        #expect(config.rules.count == 1)
     }
 
     @Test func decodeEmptyPluginConfig() throws {
@@ -194,30 +193,23 @@ struct ConfigCodingTests {
         let config = try JSONDecoder().decode(PluginConfig.self, from: Data(json.utf8))
         #expect(config.values.isEmpty)
         #expect(config.isSetUp == nil)
-        #expect(config.rules.isEmpty)
     }
 
     @Test func decodePluginConfigWithoutRules() throws {
         let json = #"{"values": {"key": "val"}}"#
         let config = try JSONDecoder().decode(PluginConfig.self, from: Data(json.utf8))
         #expect(config.values["key"] == .string("val"))
-        #expect(config.rules.isEmpty)
     }
 
     @Test func encodeRoundTripPluginConfig() throws {
         let original = PluginConfig(
             values: ["url": .string("http://example.com")],
-            isSetUp: false,
-            rules: [Rule(
-                match: MatchConfig(field: "x", pattern: "y"),
-                emit: [EmitConfig(field: "keywords", values: ["z"])]
-            )]
+            isSetUp: false
         )
         let data = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(PluginConfig.self, from: data)
         #expect(decoded.values["url"] == .string("http://example.com"))
         #expect(decoded.isSetUp == false)
-        #expect(decoded.rules.count == 1)
     }
 
     // MARK: - StageConfig
