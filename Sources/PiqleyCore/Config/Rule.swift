@@ -50,9 +50,22 @@ public struct EmitConfig: Codable, Sendable, Equatable {
 public struct Rule: Codable, Sendable, Equatable {
     public let match: MatchConfig
     public let emit: [EmitConfig]
+    public let write: [EmitConfig]
 
-    public init(match: MatchConfig, emit: [EmitConfig]) {
+    public init(match: MatchConfig, emit: [EmitConfig], write: [EmitConfig] = []) {
         self.match = match
         self.emit = emit
+        self.write = write
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case match, emit, write
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        match = try container.decode(MatchConfig.self, forKey: .match)
+        emit = try container.decode([EmitConfig].self, forKey: .emit)
+        write = try container.decodeIfPresent([EmitConfig].self, forKey: .write) ?? []
     }
 }

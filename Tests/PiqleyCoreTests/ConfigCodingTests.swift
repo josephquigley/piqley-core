@@ -119,6 +119,45 @@ struct ConfigCodingTests {
         #expect(rule.emit[1].values == ["fresh"])
     }
 
+    // MARK: - Write array
+
+    @Test func decodeRuleWithWrite() throws {
+        let json = """
+        {
+            "match": {"field": "original:TIFF:Model", "pattern": "Canon"},
+            "emit": [{"field": "keywords", "values": ["canon"]}],
+            "write": [{"action": "add", "field": "IPTC:Keywords", "values": ["canon"]}]
+        }
+        """
+        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        #expect(rule.write.count == 1)
+        #expect(rule.write[0].action == "add")
+        #expect(rule.write[0].field == "IPTC:Keywords")
+    }
+
+    @Test func decodeRuleWithoutWriteDefaultsEmpty() throws {
+        let json = """
+        {
+            "match": {"field": "title", "pattern": ".*"},
+            "emit": [{"field": "keywords", "values": ["any"]}]
+        }
+        """
+        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        #expect(rule.write.isEmpty)
+    }
+
+    @Test func encodeRoundTripRuleWithWrite() throws {
+        let rule = Rule(
+            match: MatchConfig(field: "title", pattern: "test"),
+            emit: [EmitConfig(field: "keywords", values: ["a"])],
+            write: [EmitConfig(action: "remove", field: "IPTC:Keywords", values: ["old"])]
+        )
+        let data = try JSONEncoder().encode(rule)
+        let decoded = try JSONDecoder().decode(Rule.self, from: data)
+        #expect(decoded.write.count == 1)
+        #expect(decoded.write[0].action == "remove")
+    }
+
     // MARK: - PluginConfig
 
     @Test func decodePluginConfigWithRules() throws {
