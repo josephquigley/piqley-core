@@ -10,12 +10,12 @@ struct ManifestValidatorTests {
     func makeManifest(
         identifier: String = "com.test.my-plugin",
         name: String = "MyPlugin",
-        pluginProtocolVersion: String = "1.0"
+        pluginSchemaVersion: String = "1"
     ) -> PluginManifest {
         PluginManifest(
             identifier: identifier,
             name: name,
-            pluginProtocolVersion: pluginProtocolVersion
+            pluginSchemaVersion: pluginSchemaVersion
         )
     }
 
@@ -39,9 +39,21 @@ struct ManifestValidatorTests {
         #expect(!errors.isEmpty)
     }
 
-    @Test func emptyProtocolVersionFails() {
-        let manifest = makeManifest(pluginProtocolVersion: "")
+    @Test func emptySchemaVersionFails() {
+        let manifest = makeManifest(pluginSchemaVersion: "")
         let errors = ManifestValidator.validate(manifest)
         #expect(!errors.isEmpty)
+    }
+
+    @Test func unsupportedSchemaVersionFails() {
+        let manifest = makeManifest(pluginSchemaVersion: "999")
+        let errors = ManifestValidator.validate(manifest)
+        #expect(errors.contains { $0.contains("999") })
+    }
+
+    @Test func supportedSchemaVersionPasses() {
+        let manifest = makeManifest(pluginSchemaVersion: "1")
+        let errors = ManifestValidator.validate(manifest)
+        #expect(errors.isEmpty)
     }
 }

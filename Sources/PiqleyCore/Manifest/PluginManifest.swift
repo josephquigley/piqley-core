@@ -6,17 +6,20 @@ public struct PluginManifest: Codable, Sendable, Equatable {
     public let name: String
     /// Short description of what the plugin does.
     public let description: String?
-    public let pluginProtocolVersion: String
+    public let pluginSchemaVersion: String
     public let pluginVersion: SemanticVersion?
     public let config: [ConfigEntry]
     public let setup: SetupConfig?
     public let dependencies: [PluginDependency]?
 
+    /// The set of schema versions this build of PiqleyCore supports.
+    public static let supportedSchemaVersions: Set<String> = ["1"]
+
     public init(
         identifier: String,
         name: String,
         description: String? = nil,
-        pluginProtocolVersion: String,
+        pluginSchemaVersion: String,
         pluginVersion: SemanticVersion? = nil,
         config: [ConfigEntry] = [],
         setup: SetupConfig? = nil,
@@ -25,7 +28,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         self.identifier = identifier
         self.name = name
         self.description = description
-        self.pluginProtocolVersion = pluginProtocolVersion
+        self.pluginSchemaVersion = pluginSchemaVersion
         self.pluginVersion = pluginVersion
         self.config = config
         self.setup = setup
@@ -34,7 +37,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case identifier, name, description
-        case pluginProtocolVersion, pluginVersion
+        case pluginSchemaVersion, pluginProtocolVersion, pluginVersion
         case config, setup, dependencies
     }
 
@@ -43,7 +46,8 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         identifier = try container.decode(String.self, forKey: .identifier)
         name = try container.decode(String.self, forKey: .name)
         description = try container.decodeIfPresent(String.self, forKey: .description)
-        pluginProtocolVersion = try container.decode(String.self, forKey: .pluginProtocolVersion)
+        pluginSchemaVersion = try container.decodeIfPresent(String.self, forKey: .pluginSchemaVersion)
+            ?? container.decode(String.self, forKey: .pluginProtocolVersion)
         pluginVersion = try container.decodeIfPresent(SemanticVersion.self, forKey: .pluginVersion)
         config = try container.decodeIfPresent([ConfigEntry].self, forKey: .config) ?? []
         setup = try container.decodeIfPresent(SetupConfig.self, forKey: .setup)
@@ -54,6 +58,18 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         } else {
             dependencies = nil
         }
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(identifier, forKey: .identifier)
+        try container.encode(name, forKey: .name)
+        try container.encodeIfPresent(description, forKey: .description)
+        try container.encode(pluginSchemaVersion, forKey: .pluginSchemaVersion)
+        try container.encodeIfPresent(pluginVersion, forKey: .pluginVersion)
+        try container.encode(config, forKey: .config)
+        try container.encodeIfPresent(setup, forKey: .setup)
+        try container.encodeIfPresent(dependencies, forKey: .dependencies)
     }
 
     /// The dependency identifiers as plain strings.

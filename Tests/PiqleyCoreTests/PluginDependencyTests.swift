@@ -53,7 +53,7 @@ struct PluginDependencyTests {
         {
             "identifier": "com.test.my-plugin",
             "name": "MyPlugin",
-            "pluginProtocolVersion": "1.0",
+            "pluginSchemaVersion": "1.0",
             "dependencies": [
                 {
                     "url": "https://example.com/dep.piqleyplugin",
@@ -73,7 +73,7 @@ struct PluginDependencyTests {
         {
             "identifier": "com.test.legacy",
             "name": "LegacyPlugin",
-            "pluginProtocolVersion": "1.0",
+            "pluginSchemaVersion": "1.0",
             "dependencies": ["other-plugin", "another"]
         }
         """

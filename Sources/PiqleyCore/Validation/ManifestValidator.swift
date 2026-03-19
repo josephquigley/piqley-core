@@ -13,8 +13,13 @@ public enum ManifestValidator {
             errors.append("Plugin name must not be empty.")
         }
 
-        if manifest.pluginProtocolVersion.isEmpty {
-            errors.append("Plugin protocol version must not be empty.")
+        if manifest.pluginSchemaVersion.isEmpty {
+            errors.append("Plugin schema version must not be empty.")
+        }
+
+        if !PluginManifest.supportedSchemaVersions.contains(manifest.pluginSchemaVersion) {
+            let supported = PluginManifest.supportedSchemaVersions.sorted().joined(separator: ", ")
+            errors.append("Unsupported schema version '\(manifest.pluginSchemaVersion)' (supported: \(supported)).")
         }
 
         return errors

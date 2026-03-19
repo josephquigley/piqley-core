@@ -164,7 +164,7 @@ struct ManifestCodingTests {
             "identifier": "com.test.my-plugin",
             "name": "MyPlugin",
             "description": "A test plugin.",
-            "pluginProtocolVersion": "1.0",
+            "pluginSchemaVersion": "1.0",
             "pluginVersion": "2.3.1",
             "config": [
                 {"key": "apiUrl", "type": "string", "value": "https://example.com"},
@@ -178,7 +178,7 @@ struct ManifestCodingTests {
         #expect(manifest.identifier == "com.test.my-plugin")
         #expect(manifest.name == "MyPlugin")
         #expect(manifest.description == "A test plugin.")
-        #expect(manifest.pluginProtocolVersion == "1.0")
+        #expect(manifest.pluginSchemaVersion == "1.0")
         #expect(manifest.pluginVersion == SemanticVersion(major: 2, minor: 3, patch: 1))
         #expect(manifest.config.count == 2)
         #expect(manifest.setup?.command == "setup.sh")
@@ -191,14 +191,14 @@ struct ManifestCodingTests {
         {
             "identifier": "com.test.minimal",
             "name": "MinimalPlugin",
-            "pluginProtocolVersion": "1.0"
+            "pluginSchemaVersion": "1.0"
         }
         """
         let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
         #expect(manifest.identifier == "com.test.minimal")
         #expect(manifest.name == "MinimalPlugin")
         #expect(manifest.description == nil)
-        #expect(manifest.pluginProtocolVersion == "1.0")
+        #expect(manifest.pluginSchemaVersion == "1.0")
         #expect(manifest.pluginVersion == nil)
         #expect(manifest.config.isEmpty)
         #expect(manifest.setup == nil)
@@ -210,7 +210,7 @@ struct ManifestCodingTests {
         {
             "identifier": "com.test.secrets",
             "name": "MyPlugin",
-            "pluginProtocolVersion": "1.0",
+            "pluginSchemaVersion": "1.0",
             "config": [
                 {"key": "apiUrl", "type": "string", "value": "https://example.com"},
                 {"secret_key": "API_TOKEN", "type": "string"},
@@ -230,7 +230,7 @@ struct ManifestCodingTests {
         {
             "identifier": "com.test.values",
             "name": "MyPlugin",
-            "pluginProtocolVersion": "1.0",
+            "pluginSchemaVersion": "1.0",
             "config": [
                 {"key": "apiUrl", "type": "string", "value": "https://example.com"},
                 {"secret_key": "API_TOKEN", "type": "string"},
@@ -250,7 +250,7 @@ struct ManifestCodingTests {
         let original = PluginManifest(
             identifier: "com.test.roundtrip",
             name: "TestPlugin",
-            pluginProtocolVersion: "1.0",
+            pluginSchemaVersion: "1.0",
             pluginVersion: SemanticVersion(major: 1, minor: 0, patch: 0),
             config: [.value(key: "url", type: .string, value: .string("http://example.com"))],
             setup: nil,
@@ -260,7 +260,7 @@ struct ManifestCodingTests {
         let decoded = try JSONDecoder().decode(PluginManifest.self, from: data)
         #expect(decoded.identifier == original.identifier)
         #expect(decoded.name == original.name)
-        #expect(decoded.pluginProtocolVersion == original.pluginProtocolVersion)
+        #expect(decoded.pluginSchemaVersion == original.pluginSchemaVersion)
         #expect(decoded.pluginVersion == original.pluginVersion)
         #expect(decoded.config.count == original.config.count)
     }
