@@ -1,0 +1,55 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## Unreleased
+
+### Added
+
+- `StageConfig` type for per-stage plugin configuration
+- `RuleEditingContext` for rule editor query and validation
+- `RuleBuilder` for step-by-step validated rule construction
+- `RuleValidator` and `RuleValidationError` types
+- `RuleSlot` and `StageConfig` mutation methods
+- `FieldInfo` and `MetadataFieldCatalog` for rule editor field selection
+- `source` property on `EmitConfig` for clone emit action
+- Environment mapping field on `HookConfig`
+- `identifier` and `description` fields on `PluginManifest`
+- Stage file constants in `PluginConfig`
+- `write` array on `Rule` for metadata write actions
+- `action` and `replacements` on `EmitConfig`; `Rule.emit` as array
+
+### Changed
+
+- Renamed `pluginProtocolVersion` to `pluginSchemaVersion` with version validation
+- Renamed `folderPath` to `imageFolderPath` in plugin input payload
+- Migrated `PluginManifest.dependencies` to structured `PluginDependency` type
+- Removed `hook` from `MatchConfig` — stage files imply the hook
+- Removed `rules` from `PluginConfig`
+- Removed redundant `schedule` hook
+
+## [0.2.0] — 2026-03-18
+
+### Added
+
+- Shared constants for reserved names, plugin files, and pattern prefixes
+
+## [0.1.0] — 2026-03-18
+
+### Added
+
+- `JSONValue` type with `Codable` and `ExpressibleBy` conformances
+- `Hook` enum with canonical pipeline stages
+- `ConfigValueType` and `PluginProtocol` enums
+- `SemanticVersion` type with parsing and comparison
+- `ConfigEntry` type with value and secret cases
+- `HookConfig`, `SetupConfig`, and `BatchProxyConfig` types
+- `PluginManifest` type with config, hooks, and dependencies
+- `Rule` and `PluginConfig` types for declarative metadata rules
+- `PluginInputPayload` and `PluginOutputLine` types for stdin/stdout communication
+- `ManifestValidator` with constraint checking
+
+[0.2.0]: https://github.com/josephquigley/piqley-core/compare/0.1.0...0.2.0
+[0.1.0]: https://github.com/josephquigley/piqley-core/releases/tag/0.1.0
