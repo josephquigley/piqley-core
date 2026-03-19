@@ -8,6 +8,7 @@ public struct HookConfig: Codable, Sendable, Equatable {
     public let warningCodes: [Int32]?
     public let criticalCodes: [Int32]?
     public let batchProxy: BatchProxyConfig?
+    public let environment: [String: String]?
 
     public init(
         command: String? = nil,
@@ -17,7 +18,8 @@ public struct HookConfig: Codable, Sendable, Equatable {
         successCodes: [Int32]? = nil,
         warningCodes: [Int32]? = nil,
         criticalCodes: [Int32]? = nil,
-        batchProxy: BatchProxyConfig? = nil
+        batchProxy: BatchProxyConfig? = nil,
+        environment: [String: String]? = nil
     ) {
         self.command = command
         self.args = args
@@ -27,6 +29,7 @@ public struct HookConfig: Codable, Sendable, Equatable {
         self.warningCodes = warningCodes
         self.criticalCodes = criticalCodes
         self.batchProxy = batchProxy
+        self.environment = environment
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -38,6 +41,7 @@ public struct HookConfig: Codable, Sendable, Equatable {
         case warningCodes
         case criticalCodes
         case batchProxy
+        case environment
     }
 
     public init(from decoder: any Decoder) throws {
@@ -50,6 +54,7 @@ public struct HookConfig: Codable, Sendable, Equatable {
         warningCodes = try container.decodeIfPresent([Int32].self, forKey: .warningCodes)
         criticalCodes = try container.decodeIfPresent([Int32].self, forKey: .criticalCodes)
         batchProxy = try container.decodeIfPresent(BatchProxyConfig.self, forKey: .batchProxy)
+        environment = try container.decodeIfPresent([String: String].self, forKey: .environment)
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -64,5 +69,6 @@ public struct HookConfig: Codable, Sendable, Equatable {
         try container.encodeIfPresent(warningCodes, forKey: .warningCodes)
         try container.encodeIfPresent(criticalCodes, forKey: .criticalCodes)
         try container.encodeIfPresent(batchProxy, forKey: .batchProxy)
+        try container.encodeIfPresent(environment, forKey: .environment)
     }
 }
