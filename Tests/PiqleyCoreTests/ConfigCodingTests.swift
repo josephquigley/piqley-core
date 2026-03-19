@@ -210,4 +210,104 @@ struct ConfigCodingTests {
         #expect(decoded.isSetUp == false)
         #expect(decoded.rules.count == 1)
     }
+
+    // MARK: - StageConfig
+
+    @Test func decodeFullStageConfig() throws {
+        let json = """
+        {
+            "preRules": [
+                {
+                    "match": {"field": "original:TIFF:Model", "pattern": "glob:Canon*"},
+                    "emit": [{"field": "keywords", "values": ["canon"]}]
+                }
+            ],
+            "binary": {
+                "command": "./bin/my-plugin",
+                "args": ["--quality", "high"],
+                "timeout": 60,
+                "protocol": "json"
+            },
+            "postRules": [
+                {
+                    "match": {"field": "my-plugin:status", "pattern": "done"},
+                    "emit": [{"field": "keywords", "values": ["processed"]}],
+                    "write": [{"action": "add", "field": "IPTC:Keywords", "values": ["processed"]}]
+                }
+            ]
+        }
+        """
+        let stage = try JSONDecoder().decode(StageConfig.self, from: Data(json.utf8))
+        #expect(stage.preRules?.count == 1)
+        #expect(stage.preRules?[0].match.field == "original:TIFF:Model")
+        #expect(stage.binary?.command == "./bin/my-plugin")
+        #expect(stage.binary?.timeout == 60)
+        #expect(stage.postRules?.count == 1)
+        #expect(stage.postRules?[0].write.count == 1)
+    }
+
+    @Test func decodeBinaryOnlyStageConfig() throws {
+        let json = """
+        {
+            "binary": {"command": "./bin/tool", "timeout": 30}
+        }
+        """
+        let stage = try JSONDecoder().decode(StageConfig.self, from: Data(json.utf8))
+        #expect(stage.preRules == nil)
+        #expect(stage.binary?.command == "./bin/tool")
+        #expect(stage.postRules == nil)
+    }
+
+    @Test func decodeRulesOnlyStageConfig() throws {
+        let json = """
+        {
+            "preRules": [
+                {
+                    "match": {"field": "title", "pattern": ".*"},
+                    "emit": [{"field": "keywords", "values": ["tagged"]}]
+                }
+            ]
+        }
+        """
+        let stage = try JSONDecoder().decode(StageConfig.self, from: Data(json.utf8))
+        #expect(stage.preRules?.count == 1)
+        #expect(stage.binary == nil)
+        #expect(stage.postRules == nil)
+    }
+
+    @Test func decodeEmptyStageConfig() throws {
+        let json = "{}"
+        let stage = try JSONDecoder().decode(StageConfig.self, from: Data(json.utf8))
+        #expect(stage.preRules == nil)
+        #expect(stage.binary == nil)
+        #expect(stage.postRules == nil)
+    }
+
+    @Test func encodeRoundTripStageConfig() throws {
+        let stage = StageConfig(
+            preRules: [Rule(
+                match: MatchConfig(field: "title", pattern: "test"),
+                emit: [EmitConfig(field: "keywords", values: ["a"])]
+            )],
+            binary: HookConfig(command: "./bin/tool", timeout: 30),
+            postRules: nil
+        )
+        let data = try JSONEncoder().encode(stage)
+        let decoded = try JSONDecoder().decode(StageConfig.self, from: data)
+        #expect(decoded.preRules?.count == 1)
+        #expect(decoded.binary?.command == "./bin/tool")
+        #expect(decoded.postRules == nil)
+    }
+
+    @Test func stageConfigIsEmpty() {
+        let empty = StageConfig(preRules: nil, binary: nil, postRules: nil)
+        #expect(empty.isEmpty)
+
+        let notEmpty = StageConfig(
+            preRules: [Rule(match: MatchConfig(field: "x", pattern: "y"), emit: [])],
+            binary: nil,
+            postRules: nil
+        )
+        #expect(!notEmpty.isEmpty)
+    }
 }
