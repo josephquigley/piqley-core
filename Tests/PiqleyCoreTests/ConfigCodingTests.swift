@@ -10,12 +10,11 @@ struct ConfigCodingTests {
     @Test func decodeRule() throws {
         let json = """
         {
-            "match": {"hook": "pre-process", "field": "title", "pattern": "^Draft"},
+            "match": {"field": "title", "pattern": "^Draft"},
             "emit": [{"field": "status", "values": ["draft", "wip"]}]
         }
         """
         let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
-        #expect(rule.match.hook == "pre-process")
         #expect(rule.match.field == "title")
         #expect(rule.match.pattern == "^Draft")
         #expect(rule.emit[0].field == "status")
@@ -30,7 +29,6 @@ struct ConfigCodingTests {
         }
         """
         let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
-        #expect(rule.match.hook == nil)
         #expect(rule.match.field == "title")
         #expect(rule.match.pattern == ".*")
         #expect(rule.emit[0].action == nil)
@@ -40,16 +38,27 @@ struct ConfigCodingTests {
 
     @Test func encodeRoundTripRule() throws {
         let rule = Rule(
-            match: MatchConfig(hook: "publish", field: "category", pattern: "tech"),
+            match: MatchConfig(field: "category", pattern: "tech"),
             emit: [EmitConfig(field: "tag", values: ["technology"])]
         )
         let data = try JSONEncoder().encode(rule)
         let decoded = try JSONDecoder().decode(Rule.self, from: data)
-        #expect(decoded.match.hook == rule.match.hook)
         #expect(decoded.match.field == rule.match.field)
         #expect(decoded.match.pattern == rule.match.pattern)
         #expect(decoded.emit[0].field == rule.emit[0].field)
         #expect(decoded.emit[0].values == rule.emit[0].values)
+    }
+
+    @Test func decodeMatchConfigIgnoresHookField() throws {
+        let json = """
+        {
+            "match": {"hook": "pre-process", "field": "title", "pattern": "test"},
+            "emit": [{"field": "keywords", "values": ["a"]}]
+        }
+        """
+        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        #expect(rule.match.field == "title")
+        #expect(rule.match.pattern == "test")
     }
 
     // MARK: - Emit actions
@@ -200,7 +209,7 @@ struct ConfigCodingTests {
             values: ["url": .string("http://example.com")],
             isSetUp: false,
             rules: [Rule(
-                match: MatchConfig(hook: nil, field: "x", pattern: "y"),
+                match: MatchConfig(field: "x", pattern: "y"),
                 emit: [EmitConfig(field: "keywords", values: ["z"])]
             )]
         )

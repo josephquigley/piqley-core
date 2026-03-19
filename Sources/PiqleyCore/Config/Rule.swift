@@ -1,14 +1,11 @@
 /// Match configuration for a declarative metadata rule.
 public struct MatchConfig: Codable, Sendable, Equatable {
-    /// The hook this rule applies to. If nil, applies to all hooks.
-    public let hook: String?
     /// The metadata field to match against.
     public let field: String
     /// The regex pattern to match against the field value.
     public let pattern: String
 
-    public init(hook: String? = nil, field: String, pattern: String) {
-        self.hook = hook
+    public init(field: String, pattern: String) {
         self.field = field
         self.pattern = pattern
     }
