@@ -26,20 +26,23 @@ public struct Replacement: Codable, Sendable, Equatable {
 
 /// Emit configuration for a declarative metadata rule.
 public struct EmitConfig: Codable, Sendable, Equatable {
-    /// The action to perform: "add", "remove", "replace", "removeField". Nil defaults to "add".
+    /// The action to perform: "add", "remove", "replace", "removeField", "clone". Nil defaults to "add".
     public let action: String?
-    /// The target field. Required. Use "*" with removeField to remove all fields.
+    /// The target field. Required. Use "*" with removeField/clone to target all fields.
     public let field: String
     /// Values to add or patterns to remove. Required for add and remove actions.
     public let values: [String]?
     /// Ordered pattern-to-replacement mappings for the replace action.
     public let replacements: [Replacement]?
+    /// Source namespace:field reference for clone action.
+    public let source: String?
 
-    public init(action: String? = nil, field: String, values: [String]? = nil, replacements: [Replacement]? = nil) {
+    public init(action: String?, field: String, values: [String]?, replacements: [Replacement]?, source: String?) {
         self.action = action
         self.field = field
         self.values = values
         self.replacements = replacements
+        self.source = source
     }
 }
 

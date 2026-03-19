@@ -39,7 +39,7 @@ struct ConfigCodingTests {
     @Test func encodeRoundTripRule() throws {
         let rule = Rule(
             match: MatchConfig(field: "category", pattern: "tech"),
-            emit: [EmitConfig(field: "tag", values: ["technology"])]
+            emit: [EmitConfig(action: nil, field: "tag", values: ["technology"], replacements: nil, source: nil)]
         )
         let data = try JSONEncoder().encode(rule)
         let decoded = try JSONDecoder().decode(Rule.self, from: data)
@@ -128,6 +128,31 @@ struct ConfigCodingTests {
         #expect(rule.emit[1].values == ["fresh"])
     }
 
+    // MARK: - Clone emit action
+
+    @Test func encodeRoundTripCloneEmitConfig() throws {
+        let config = EmitConfig(action: "clone", field: "keywords", values: nil, replacements: nil, source: "original:IPTC:Keywords")
+        let data = try JSONEncoder().encode(config)
+        let decoded = try JSONDecoder().decode(EmitConfig.self, from: data)
+        #expect(decoded.action == "clone")
+        #expect(decoded.field == "keywords")
+        #expect(decoded.values == nil)
+        #expect(decoded.replacements == nil)
+        #expect(decoded.source == "original:IPTC:Keywords")
+    }
+
+    @Test func decodeWildcardCloneEmitConfig() throws {
+        let json = """
+        { "action": "clone", "field": "*", "source": "original" }
+        """
+        let config = try JSONDecoder().decode(EmitConfig.self, from: Data(json.utf8))
+        #expect(config.action == "clone")
+        #expect(config.field == "*")
+        #expect(config.source == "original")
+        #expect(config.values == nil)
+        #expect(config.replacements == nil)
+    }
+
     // MARK: - Write array
 
     @Test func decodeRuleWithWrite() throws {
@@ -158,8 +183,8 @@ struct ConfigCodingTests {
     @Test func encodeRoundTripRuleWithWrite() throws {
         let rule = Rule(
             match: MatchConfig(field: "title", pattern: "test"),
-            emit: [EmitConfig(field: "keywords", values: ["a"])],
-            write: [EmitConfig(action: "remove", field: "IPTC:Keywords", values: ["old"])]
+            emit: [EmitConfig(action: nil, field: "keywords", values: ["a"], replacements: nil, source: nil)],
+            write: [EmitConfig(action: "remove", field: "IPTC:Keywords", values: ["old"], replacements: nil, source: nil)]
         )
         let data = try JSONEncoder().encode(rule)
         let decoded = try JSONDecoder().decode(Rule.self, from: data)
@@ -288,7 +313,7 @@ struct ConfigCodingTests {
         let stage = StageConfig(
             preRules: [Rule(
                 match: MatchConfig(field: "title", pattern: "test"),
-                emit: [EmitConfig(field: "keywords", values: ["a"])]
+                emit: [EmitConfig(action: nil, field: "keywords", values: ["a"], replacements: nil, source: nil)]
             )],
             binary: HookConfig(command: "./bin/tool", timeout: 30),
             postRules: nil
