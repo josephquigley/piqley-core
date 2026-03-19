@@ -2,11 +2,11 @@
 /// Each stage file (`stage-<name>.json`) contains up to three optional sections.
 public struct StageConfig: Codable, Sendable, Equatable {
     /// Rules evaluated before the binary runs.
-    public let preRules: [Rule]?
+    public var preRules: [Rule]?
     /// Binary execution configuration.
     public let binary: HookConfig?
     /// Rules evaluated after the binary runs.
-    public let postRules: [Rule]?
+    public var postRules: [Rule]?
 
     public init(preRules: [Rule]? = nil, binary: HookConfig? = nil, postRules: [Rule]? = nil) {
         self.preRules = preRules
