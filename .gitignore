@@ -1,7 +1,17 @@
+# Swift
 .build/
 .swiftpm/
+DerivedData/
+Package.resolved
 *.xcodeproj/
 xcuserdata/
-DerivedData/
+
+# OS
 .DS_Store
+
+# Credentials
+.netrc
+
+# Tools
+.claude/settings.local.json
 .worktrees/
