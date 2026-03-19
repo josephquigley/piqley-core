@@ -11,44 +11,112 @@ struct ConfigCodingTests {
         let json = """
         {
             "match": {"hook": "pre-process", "field": "title", "pattern": "^Draft"},
-            "emit": {"field": "status", "values": ["draft", "wip"]}
+            "emit": [{"field": "status", "values": ["draft", "wip"]}]
         }
         """
         let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
         #expect(rule.match.hook == "pre-process")
         #expect(rule.match.field == "title")
         #expect(rule.match.pattern == "^Draft")
-        #expect(rule.emit.field == "status")
-        #expect(rule.emit.values == ["draft", "wip"])
+        #expect(rule.emit[0].field == "status")
+        #expect(rule.emit[0].values == ["draft", "wip"])
     }
 
     @Test func decodeMinimalRule() throws {
         let json = """
         {
             "match": {"field": "title", "pattern": ".*"},
-            "emit": {"values": ["any"]}
+            "emit": [{"field": "keywords", "values": ["any"]}]
         }
         """
         let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
         #expect(rule.match.hook == nil)
         #expect(rule.match.field == "title")
         #expect(rule.match.pattern == ".*")
-        #expect(rule.emit.field == nil)
-        #expect(rule.emit.values == ["any"])
+        #expect(rule.emit[0].action == nil)
+        #expect(rule.emit[0].field == "keywords")
+        #expect(rule.emit[0].values == ["any"])
     }
 
     @Test func encodeRoundTripRule() throws {
         let rule = Rule(
             match: MatchConfig(hook: "publish", field: "category", pattern: "tech"),
-            emit: EmitConfig(field: "tag", values: ["technology"])
+            emit: [EmitConfig(field: "tag", values: ["technology"])]
         )
         let data = try JSONEncoder().encode(rule)
         let decoded = try JSONDecoder().decode(Rule.self, from: data)
         #expect(decoded.match.hook == rule.match.hook)
         #expect(decoded.match.field == rule.match.field)
         #expect(decoded.match.pattern == rule.match.pattern)
-        #expect(decoded.emit.field == rule.emit.field)
-        #expect(decoded.emit.values == rule.emit.values)
+        #expect(decoded.emit[0].field == rule.emit[0].field)
+        #expect(decoded.emit[0].values == rule.emit[0].values)
+    }
+
+    // MARK: - Emit actions
+
+    @Test func decodeEmitConfigWithAction() throws {
+        let json = """
+        {
+            "match": {"field": "title", "pattern": "^Draft"},
+            "emit": [{"action": "remove", "field": "keywords", "values": ["draft"]}]
+        }
+        """
+        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        #expect(rule.emit.count == 1)
+        #expect(rule.emit[0].action == "remove")
+        #expect(rule.emit[0].field == "keywords")
+        #expect(rule.emit[0].values == ["draft"])
+    }
+
+    @Test func decodeReplaceAction() throws {
+        let json = """
+        {
+            "match": {"field": "title", "pattern": ".*"},
+            "emit": [{
+                "action": "replace",
+                "field": "keywords",
+                "replacements": [
+                    {"pattern": "regex:SONY(.+)", "replacement": "Sony $1"},
+                    {"pattern": "old", "replacement": "new"}
+                ]
+            }]
+        }
+        """
+        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        #expect(rule.emit[0].action == "replace")
+        #expect(rule.emit[0].replacements?.count == 2)
+        #expect(rule.emit[0].replacements?[0].pattern == "regex:SONY(.+)")
+        #expect(rule.emit[0].replacements?[0].replacement == "Sony $1")
+    }
+
+    @Test func decodeRemoveFieldAction() throws {
+        let json = """
+        {
+            "match": {"field": "title", "pattern": ".*"},
+            "emit": [{"action": "removeField", "field": "*"}]
+        }
+        """
+        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        #expect(rule.emit[0].action == "removeField")
+        #expect(rule.emit[0].field == "*")
+        #expect(rule.emit[0].values == nil)
+    }
+
+    @Test func decodeMultipleEmitActions() throws {
+        let json = """
+        {
+            "match": {"field": "title", "pattern": ".*"},
+            "emit": [
+                {"action": "removeField", "field": "keywords"},
+                {"field": "keywords", "values": ["fresh"]}
+            ]
+        }
+        """
+        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        #expect(rule.emit.count == 2)
+        #expect(rule.emit[0].action == "removeField")
+        #expect(rule.emit[1].action == nil)
+        #expect(rule.emit[1].values == ["fresh"])
     }
 
     // MARK: - PluginConfig
@@ -61,7 +129,7 @@ struct ConfigCodingTests {
             "rules": [
                 {
                     "match": {"field": "title", "pattern": ".*"},
-                    "emit": {"values": ["any"]}
+                    "emit": [{"field": "keywords", "values": ["any"]}]
                 }
             ]
         }
@@ -94,7 +162,7 @@ struct ConfigCodingTests {
             isSetUp: false,
             rules: [Rule(
                 match: MatchConfig(hook: nil, field: "x", pattern: "y"),
-                emit: EmitConfig(field: nil, values: ["z"])
+                emit: [EmitConfig(field: "keywords", values: ["z"])]
             )]
         )
         let data = try JSONEncoder().encode(original)
