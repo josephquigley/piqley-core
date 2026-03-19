@@ -39,30 +39,58 @@ struct MetadataFieldCatalogTests {
 
     // MARK: - fields(forSource:)
 
-    @Test("fields(forSource:) returns FieldInfo with correct source")
+    @Test("fields(forSource:) returns FieldInfo with correct source string")
     func fieldsForSourceHasCorrectSource() {
-        let result = MetadataFieldCatalog.fields(forSource: .exif)
+        let result = MetadataFieldCatalog.fields(forSource: "exif")
         #expect(!result.isEmpty)
         for field in result {
-            #expect(field.source == .exif)
+            #expect(field.source == "exif")
         }
     }
 
     @Test("fields(forSource:) returns FieldInfo with correct qualifiedName")
     func fieldsForSourceQualifiedName() {
-        let result = MetadataFieldCatalog.fields(forSource: .exif)
+        let result = MetadataFieldCatalog.fields(forSource: "exif")
         for field in result {
             #expect(field.qualifiedName == "EXIF:\(field.name)")
         }
     }
 
-    @Test("fields(forSource:) returns sorted by category then name")
-    func fieldsForSourceSorted() {
-        // Use a mixed source set to confirm overall sort order across sources
-        let exif = MetadataFieldCatalog.fields(forSource: .exif)
-        let iptc = MetadataFieldCatalog.fields(forSource: .iptc)
+    @Test("fields(forSource:) for iptc uses IPTC prefix")
+    func fieldsForSourceIPTCQualifiedName() {
+        let result = MetadataFieldCatalog.fields(forSource: "iptc")
+        for field in result {
+            #expect(field.qualifiedName == "IPTC:\(field.name)")
+        }
+    }
 
-        // Within a single source, fields should be sorted by name
+    @Test("fields(forSource:) for xmp uses XMP prefix")
+    func fieldsForSourceXMPQualifiedName() {
+        let result = MetadataFieldCatalog.fields(forSource: "xmp")
+        for field in result {
+            #expect(field.qualifiedName == "XMP:\(field.name)")
+        }
+    }
+
+    @Test("fields(forSource:) for tiff uses TIFF prefix")
+    func fieldsForSourceTIFFQualifiedName() {
+        let result = MetadataFieldCatalog.fields(forSource: "tiff")
+        for field in result {
+            #expect(field.qualifiedName == "TIFF:\(field.name)")
+        }
+    }
+
+    @Test("fields(forSource:) returns empty for unknown source")
+    func fieldsForUnknownSourceReturnsEmpty() {
+        let result = MetadataFieldCatalog.fields(forSource: "my-plugin")
+        #expect(result.isEmpty)
+    }
+
+    @Test("fields(forSource:) returns sorted by name")
+    func fieldsForSourceSorted() {
+        let exif = MetadataFieldCatalog.fields(forSource: "exif")
+        let iptc = MetadataFieldCatalog.fields(forSource: "iptc")
+
         let exifNames = exif.map(\.name)
         #expect(exifNames == exifNames.sorted())
 
@@ -84,31 +112,58 @@ struct MetadataFieldCatalogTests {
 
     @Test("FieldInfo convenience init builds qualifiedName from source and name")
     func fieldInfoQualifiedName() {
-        let field = FieldInfo(name: "ISO", source: .exif)
-        #expect(field.qualifiedName == "EXIF:ISO")
+        let field = FieldInfo(name: "ISO", source: "exif", category: .exif)
+        #expect(field.qualifiedName == "exif:ISO")
         #expect(field.name == "ISO")
-        #expect(field.source == .exif)
+        #expect(field.source == "exif")
         #expect(field.category == .exif)
     }
 
-    @Test("FieldInfo for IPTC source has iptc category")
-    func fieldInfoIPTCCategory() {
-        let field = FieldInfo(name: "Keywords", source: .iptc)
-        #expect(field.category == .iptc)
-        #expect(field.qualifiedName == "IPTC:Keywords")
+    @Test("FieldInfo full init uses explicit qualifiedName")
+    func fieldInfoFullInit() {
+        let field = FieldInfo(name: "ISO", source: "exif", qualifiedName: "EXIF:ISO", category: .exif)
+        #expect(field.qualifiedName == "EXIF:ISO")
+        #expect(field.source == "exif")
+        #expect(field.category == .exif)
     }
 
-    @Test("FieldInfo for XMP source has xmp category")
-    func fieldInfoXMPCategory() {
-        let field = FieldInfo(name: "Rating", source: .xmp)
-        #expect(field.category == .xmp)
-        #expect(field.qualifiedName == "XMP:Rating")
+    @Test("FieldInfo for plugin source has custom category")
+    func fieldInfoPluginSource() {
+        let field = FieldInfo(name: "MyField", source: "exif-tagger", category: .custom)
+        #expect(field.category == .custom)
+        #expect(field.source == "exif-tagger")
+        #expect(field.qualifiedName == "exif-tagger:MyField")
     }
 
-    @Test("FieldInfo for TIFF source has tiff category")
-    func fieldInfoTIFFCategory() {
-        let field = FieldInfo(name: "Make", source: .tiff)
-        #expect(field.category == .tiff)
-        #expect(field.qualifiedName == "TIFF:Make")
+    @Test("FieldInfo catalog exif fields have .exif category")
+    func fieldInfoCatalogExifCategory() {
+        let result = MetadataFieldCatalog.fields(forSource: "exif")
+        for field in result {
+            #expect(field.category == .exif)
+        }
+    }
+
+    @Test("FieldInfo catalog iptc fields have .iptc category")
+    func fieldInfoCatalogIPTCCategory() {
+        let result = MetadataFieldCatalog.fields(forSource: "iptc")
+        for field in result {
+            #expect(field.category == .iptc)
+        }
+    }
+
+    @Test("FieldInfo catalog xmp fields have .xmp category")
+    func fieldInfoCatalogXMPCategory() {
+        let result = MetadataFieldCatalog.fields(forSource: "xmp")
+        for field in result {
+            #expect(field.category == .xmp)
+        }
+    }
+
+    @Test("FieldInfo catalog tiff fields have .tiff category")
+    func fieldInfoCatalogTIFFCategory() {
+        let result = MetadataFieldCatalog.fields(forSource: "tiff")
+        for field in result {
+            #expect(field.category == .tiff)
+        }
     }
 }

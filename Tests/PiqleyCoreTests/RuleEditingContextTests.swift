@@ -21,14 +21,14 @@ struct RuleEditingContextTests {
     private func makeContext() -> RuleEditingContext {
         let fields: [String: [FieldInfo]] = [
             "exif": [
-                FieldInfo(name: "ISO", source: .exif),
-                FieldInfo(name: "Aperture", source: .exif),
+                FieldInfo(name: "ISO", source: "exif", category: .exif),
+                FieldInfo(name: "Aperture", source: "exif", category: .exif),
             ],
             "iptc": [
-                FieldInfo(name: "Keywords", source: .iptc),
+                FieldInfo(name: "Keywords", source: "iptc", category: .iptc),
             ],
             "custom": [
-                FieldInfo(name: "Rating", source: .exif), // category: .exif, but key is "custom"
+                FieldInfo(name: "Rating", source: "custom", category: .custom),
             ],
         ]
         let stages: [String: StageConfig] = [
@@ -89,9 +89,9 @@ struct RuleEditingContextTests {
     @Test func fieldsInKnownSourceReturnsSortedByCategoryThenName() {
         let fields: [String: [FieldInfo]] = [
             "mixed": [
-                FieldInfo(name: "Zebra", source: .exif),
-                FieldInfo(name: "Alpha", source: .iptc),
-                FieldInfo(name: "Middle", source: .exif),
+                FieldInfo(name: "Zebra", source: "exif", category: .exif),
+                FieldInfo(name: "Alpha", source: "iptc", category: .iptc),
+                FieldInfo(name: "Middle", source: "exif", category: .exif),
             ]
         ]
         let ctx = RuleEditingContext(

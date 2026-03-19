@@ -72,20 +72,38 @@ public enum MetadataFieldCatalog {
         "YResolution",
     ].sorted()
 
+    // MARK: - Internal source map
+
+    /// Maps a well-known source string to its field names and qualified prefix.
+    private static let sourceMap: [String: (names: [String], prefix: String, category: FieldCategory)] = [
+        "exif": (exifFields, "EXIF", .exif),
+        "iptc": (iptcFields, "IPTC", .iptc),
+        "xmp":  (xmpFields,  "XMP",  .xmp),
+        "tiff": (tiffFields, "TIFF", .tiff),
+    ]
+
     // MARK: - fields(forSource:)
 
-    /// Returns a sorted array of `FieldInfo` for the given metadata source.
-    /// Fields are sorted by category (derived from source) and then alphabetically by name.
-    public static func fields(forSource source: MetadataSource) -> [FieldInfo] {
-        let names: [String]
-        switch source {
-        case .exif: names = exifFields
-        case .iptc: names = iptcFields
-        case .xmp:  names = xmpFields
-        case .tiff: names = tiffFields
+    /// Returns a sorted array of `FieldInfo` for the given source name.
+    ///
+    /// For well-known sources ("exif", "iptc", "xmp", "tiff") the catalog uses its
+    /// built-in field list and the appropriate `FieldCategory`. Unknown source strings
+    /// return an empty array.
+    ///
+    /// Fields within a source are sorted alphabetically by name.
+    public static func fields(forSource source: String) -> [FieldInfo] {
+        guard let entry = sourceMap[source] else {
+            return []
         }
-        return names
+        return entry.names
             .sorted()
-            .map { FieldInfo(name: $0, source: source) }
+            .map { name in
+                FieldInfo(
+                    name: name,
+                    source: source,
+                    qualifiedName: "\(entry.prefix):\(name)",
+                    category: entry.category
+                )
+            }
     }
 }
