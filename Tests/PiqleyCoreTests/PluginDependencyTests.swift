@@ -51,6 +51,7 @@ struct PluginDependencyTests {
     @Test func manifestDecodesStructuredDependencies() throws {
         let json = """
         {
+            "identifier": "com.test.my-plugin",
             "name": "MyPlugin",
             "pluginProtocolVersion": "1.0",
             "dependencies": [
@@ -58,8 +59,7 @@ struct PluginDependencyTests {
                     "url": "https://example.com/dep.piqleyplugin",
                     "version": {"from": "1.0.0", "rule": "upToNextMajor"}
                 }
-            ],
-            "hooks": {}
+            ]
         }
         """
         let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
@@ -71,10 +71,10 @@ struct PluginDependencyTests {
     @Test func manifestDecodesLegacyStringDependencies() throws {
         let json = """
         {
+            "identifier": "com.test.legacy",
             "name": "LegacyPlugin",
             "pluginProtocolVersion": "1.0",
-            "dependencies": ["other-plugin", "another"],
-            "hooks": {}
+            "dependencies": ["other-plugin", "another"]
         }
         """
         let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
@@ -82,6 +82,6 @@ struct PluginDependencyTests {
         #expect(manifest.dependencies?[0].name == "other-plugin")
         #expect(manifest.dependencies?[0].url == "")
         #expect(manifest.dependencies?[1].name == "another")
-        #expect(manifest.dependencyNames == ["other-plugin", "another"])
+        #expect(manifest.dependencyIdentifiers == ["other-plugin", "another"])
     }
 }

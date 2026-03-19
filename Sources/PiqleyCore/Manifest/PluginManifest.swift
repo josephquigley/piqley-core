@@ -1,44 +1,48 @@
-/// The manifest for a piqley plugin, describing its metadata, configuration, and hooks.
+/// The manifest for a piqley plugin, describing its metadata, configuration, and dependencies.
 public struct PluginManifest: Codable, Sendable, Equatable {
+    /// Reverse TLD identifier (e.g. "com.piqley.ghost"). Used as the identity key system-wide.
+    public let identifier: String
+    /// Human-readable display name.
     public let name: String
+    /// Short description of what the plugin does.
+    public let description: String?
     public let pluginProtocolVersion: String
     public let pluginVersion: SemanticVersion?
     public let config: [ConfigEntry]
     public let setup: SetupConfig?
     public let dependencies: [PluginDependency]?
-    public let hooks: [String: HookConfig]
 
     public init(
+        identifier: String,
         name: String,
+        description: String? = nil,
         pluginProtocolVersion: String,
         pluginVersion: SemanticVersion? = nil,
         config: [ConfigEntry] = [],
         setup: SetupConfig? = nil,
-        dependencies: [PluginDependency]? = nil,
-        hooks: [String: HookConfig] = [:]
+        dependencies: [PluginDependency]? = nil
     ) {
+        self.identifier = identifier
         self.name = name
+        self.description = description
         self.pluginProtocolVersion = pluginProtocolVersion
         self.pluginVersion = pluginVersion
         self.config = config
         self.setup = setup
         self.dependencies = dependencies
-        self.hooks = hooks
     }
 
     private enum CodingKeys: String, CodingKey {
-        case name
-        case pluginProtocolVersion
-        case pluginVersion
-        case config
-        case setup
-        case dependencies
-        case hooks
+        case identifier, name, description
+        case pluginProtocolVersion, pluginVersion
+        case config, setup, dependencies
     }
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        identifier = try container.decode(String.self, forKey: .identifier)
         name = try container.decode(String.self, forKey: .name)
+        description = try container.decodeIfPresent(String.self, forKey: .description)
         pluginProtocolVersion = try container.decode(String.self, forKey: .pluginProtocolVersion)
         pluginVersion = try container.decodeIfPresent(SemanticVersion.self, forKey: .pluginVersion)
         config = try container.decodeIfPresent([ConfigEntry].self, forKey: .config) ?? []
@@ -50,13 +54,10 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         } else {
             dependencies = nil
         }
-        hooks = try container.decodeIfPresent([String: HookConfig].self, forKey: .hooks) ?? [:]
     }
 
-    /// The dependency identifiers as plain strings (for backward-compatible pipeline resolution).
-    ///
-    /// Returns each dependency's ``PluginDependency/identifier`` (name if present, otherwise URL).
-    public var dependencyNames: [String] {
+    /// The dependency identifiers as plain strings.
+    public var dependencyIdentifiers: [String] {
         dependencies?.map(\.identifier) ?? []
     }
 
@@ -76,11 +77,5 @@ public struct PluginManifest: Codable, Sendable, Equatable {
             }
             return nil
         }
-    }
-
-    /// Returns hook keys that are not in the canonical hook order.
-    public func unknownHooks() -> [String] {
-        let knownRawValues = Set(Hook.canonicalOrder.map { $0.rawValue })
-        return hooks.keys.filter { !knownRawValues.contains($0) }
     }
 }

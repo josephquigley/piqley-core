@@ -161,7 +161,9 @@ struct ManifestCodingTests {
     @Test func decodeFullManifest() throws {
         let json = """
         {
+            "identifier": "com.test.my-plugin",
             "name": "MyPlugin",
+            "description": "A test plugin.",
             "pluginProtocolVersion": "1.0",
             "pluginVersion": "2.3.1",
             "config": [
@@ -169,54 +171,51 @@ struct ManifestCodingTests {
                 {"secret_key": "API_TOKEN", "type": "string"}
             ],
             "setup": {"command": "setup.sh"},
-            "dependencies": ["other-plugin"],
-            "hooks": {
-                "pre-process": {"command": "process.sh"}
-            }
+            "dependencies": ["other-plugin"]
         }
         """
         let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
+        #expect(manifest.identifier == "com.test.my-plugin")
         #expect(manifest.name == "MyPlugin")
+        #expect(manifest.description == "A test plugin.")
         #expect(manifest.pluginProtocolVersion == "1.0")
         #expect(manifest.pluginVersion == SemanticVersion(major: 2, minor: 3, patch: 1))
         #expect(manifest.config.count == 2)
         #expect(manifest.setup?.command == "setup.sh")
         #expect(manifest.dependencies?.count == 1)
-        #expect(manifest.dependencyNames == ["other-plugin"])
-        #expect(manifest.hooks["pre-process"] != nil)
+        #expect(manifest.dependencyIdentifiers == ["other-plugin"])
     }
 
     @Test func decodeMinimalManifest() throws {
         let json = """
         {
+            "identifier": "com.test.minimal",
             "name": "MinimalPlugin",
-            "pluginProtocolVersion": "1.0",
-            "hooks": {
-                "publish": {}
-            }
+            "pluginProtocolVersion": "1.0"
         }
         """
         let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
+        #expect(manifest.identifier == "com.test.minimal")
         #expect(manifest.name == "MinimalPlugin")
+        #expect(manifest.description == nil)
         #expect(manifest.pluginProtocolVersion == "1.0")
         #expect(manifest.pluginVersion == nil)
         #expect(manifest.config.isEmpty)
         #expect(manifest.setup == nil)
         #expect(manifest.dependencies == nil)
-        #expect(manifest.hooks["publish"] != nil)
     }
 
     @Test func secretKeys() throws {
         let json = """
         {
+            "identifier": "com.test.secrets",
             "name": "MyPlugin",
             "pluginProtocolVersion": "1.0",
             "config": [
                 {"key": "apiUrl", "type": "string", "value": "https://example.com"},
                 {"secret_key": "API_TOKEN", "type": "string"},
                 {"secret_key": "DB_PASS", "type": "string"}
-            ],
-            "hooks": {}
+            ]
         }
         """
         let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
@@ -229,14 +228,14 @@ struct ManifestCodingTests {
     @Test func valueEntries() throws {
         let json = """
         {
+            "identifier": "com.test.values",
             "name": "MyPlugin",
             "pluginProtocolVersion": "1.0",
             "config": [
                 {"key": "apiUrl", "type": "string", "value": "https://example.com"},
                 {"secret_key": "API_TOKEN", "type": "string"},
                 {"key": "retries", "type": "int", "value": 3}
-            ],
-            "hooks": {}
+            ]
         }
         """
         let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
@@ -247,41 +246,22 @@ struct ManifestCodingTests {
         #expect(keys.contains("retries"))
     }
 
-    @Test func unknownHooks() throws {
-        let json = """
-        {
-            "name": "MyPlugin",
-            "pluginProtocolVersion": "1.0",
-            "hooks": {
-                "pre-process": {},
-                "custom-hook": {},
-                "unknown-step": {}
-            }
-        }
-        """
-        let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
-        let unknown = manifest.unknownHooks()
-        #expect(unknown.count == 2)
-        #expect(unknown.contains("custom-hook"))
-        #expect(unknown.contains("unknown-step"))
-    }
-
     @Test func manifestEncodeRoundTrip() throws {
         let original = PluginManifest(
+            identifier: "com.test.roundtrip",
             name: "TestPlugin",
             pluginProtocolVersion: "1.0",
             pluginVersion: SemanticVersion(major: 1, minor: 0, patch: 0),
             config: [.value(key: "url", type: .string, value: .string("http://example.com"))],
             setup: nil,
-            dependencies: nil,
-            hooks: ["publish": HookConfig(command: "publish.sh")]
+            dependencies: nil
         )
         let data = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(PluginManifest.self, from: data)
+        #expect(decoded.identifier == original.identifier)
         #expect(decoded.name == original.name)
         #expect(decoded.pluginProtocolVersion == original.pluginProtocolVersion)
         #expect(decoded.pluginVersion == original.pluginVersion)
         #expect(decoded.config.count == original.config.count)
-        #expect(decoded.hooks["publish"]?.command == "publish.sh")
     }
 }
