@@ -19,4 +19,42 @@ struct SkipRecordTests {
         #expect(record.file == "IMG_001.jpg")
         #expect(record.plugin == "com.test.plugin")
     }
+
+    @Test func payloadDecodesWithoutSkippedField() throws {
+        let json = """
+        {
+            "hook": "publish",
+            "imageFolderPath": "/tmp/images",
+            "pluginConfig": {},
+            "secrets": {},
+            "executionLogPath": "/tmp/log",
+            "dataPath": "/tmp/data",
+            "logPath": "/tmp/log.txt",
+            "dryRun": false,
+            "pluginVersion": "1.0.0"
+        }
+        """
+        let payload = try JSONDecoder().decode(PluginInputPayload.self, from: json.data(using: .utf8)!)
+        #expect(payload.skipped.isEmpty)
+    }
+
+    @Test func payloadDecodesWithSkippedField() throws {
+        let json = """
+        {
+            "hook": "publish",
+            "imageFolderPath": "/tmp/images",
+            "pluginConfig": {},
+            "secrets": {},
+            "executionLogPath": "/tmp/log",
+            "dataPath": "/tmp/data",
+            "logPath": "/tmp/log.txt",
+            "dryRun": false,
+            "pluginVersion": "1.0.0",
+            "skipped": [{"file": "IMG_001.jpg", "plugin": "com.test.plugin"}]
+        }
+        """
+        let payload = try JSONDecoder().decode(PluginInputPayload.self, from: json.data(using: .utf8)!)
+        #expect(payload.skipped.count == 1)
+        #expect(payload.skipped[0].file == "IMG_001.jpg")
+    }
 }

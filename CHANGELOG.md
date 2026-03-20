@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `skipped: [SkipRecord]` field on `PluginInputPayload` for backwards-compatible propagation of skipped images via the wire payload
 - `SkipRecord` type for representing a skipped image in the pipeline wire payload
 - `RuleValidator.validateRule(_:)` for rule-level validation of skip constraints
 - `RuleValidationError.skipWithWrite` and `.skipNotAlone` cases

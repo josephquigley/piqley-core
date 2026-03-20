@@ -22,6 +22,8 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
     public let pluginVersion: SemanticVersion
     /// The last version of this plugin that was executed.
     public let lastExecutedVersion: SemanticVersion?
+    /// Images that were skipped during pipeline processing.
+    public let skipped: [SkipRecord]
 
     public init(
         hook: String,
@@ -34,7 +36,8 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
         dryRun: Bool,
         state: [String: [String: [String: JSONValue]]]?,
         pluginVersion: SemanticVersion,
-        lastExecutedVersion: SemanticVersion?
+        lastExecutedVersion: SemanticVersion?,
+        skipped: [SkipRecord] = []
     ) {
         self.hook = hook
         self.imageFolderPath = imageFolderPath
@@ -47,5 +50,22 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
         self.state = state
         self.pluginVersion = pluginVersion
         self.lastExecutedVersion = lastExecutedVersion
+        self.skipped = skipped
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        hook = try container.decode(String.self, forKey: .hook)
+        imageFolderPath = try container.decode(String.self, forKey: .imageFolderPath)
+        pluginConfig = try container.decode([String: JSONValue].self, forKey: .pluginConfig)
+        secrets = try container.decode([String: String].self, forKey: .secrets)
+        executionLogPath = try container.decode(String.self, forKey: .executionLogPath)
+        dataPath = try container.decode(String.self, forKey: .dataPath)
+        logPath = try container.decode(String.self, forKey: .logPath)
+        dryRun = try container.decode(Bool.self, forKey: .dryRun)
+        state = try container.decodeIfPresent([String: [String: [String: JSONValue]]].self, forKey: .state)
+        pluginVersion = try container.decode(SemanticVersion.self, forKey: .pluginVersion)
+        lastExecutedVersion = try container.decodeIfPresent(SemanticVersion.self, forKey: .lastExecutedVersion)
+        skipped = try container.decodeIfPresent([SkipRecord].self, forKey: .skipped) ?? []
     }
 }
