@@ -21,7 +21,7 @@ struct RuleValidationTests {
 
     func makeEmit(
         action: String? = nil,
-        field: String = "Keywords",
+        field: String? = "Keywords",
         values: [String]? = ["foo"],
         replacements: [Replacement]? = nil,
         source: String? = nil
@@ -398,6 +398,14 @@ struct RuleValidationTests {
         let a = RuleValidationError.invalidPattern("regex:[bad", underlying: err1)
         let b = RuleValidationError.invalidPattern("regex:[different", underlying: err2)
         #expect(a != b)
+    }
+
+    // MARK: - EmitConfig.field optional
+
+    @Test func emitConfigAcceptsNilField() {
+        let config = EmitConfig(action: "skip", field: nil, values: nil, replacements: nil, source: nil)
+        #expect(config.field == nil)
+        #expect(config.action == "skip")
     }
 
     // MARK: - Private helpers

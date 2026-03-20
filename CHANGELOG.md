@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `EmitConfig.field` is now optional (`String?`) to support actions that require no target field (e.g. "skip")
+- `ReservedName.skip` and `ReservedName.skipRecords` constants
 - `StageConfig` type for per-stage plugin configuration
 - `RuleEditingContext` for rule editor query and validation
 - `RuleBuilder` for step-by-step validated rule construction

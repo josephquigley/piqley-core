@@ -41,7 +41,7 @@ public enum RuleValidator {
     /// - Parameter emit: The emit configuration to validate.
     /// - Returns: `.success(())` if valid, or a `.failure` with the specific error.
     public static func validateEmit(_ emit: EmitConfig) -> Result<Void, RuleValidationError> {
-        guard !emit.field.isEmpty else {
+        if let field = emit.field, field.isEmpty {
             return .failure(.emptyField)
         }
 
