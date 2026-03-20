@@ -27,6 +27,12 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
     /// The emit array is empty — a rule must have at least one action.
     case noActions
 
+    /// A skip emit was combined with a non-empty write array.
+    case skipWithWrite
+
+    /// A skip emit was combined with other emit actions in the same rule.
+    case skipNotAlone
+
     // MARK: - LocalizedError
 
     public var errorDescription: String? {
@@ -47,6 +53,10 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
             return "The rule's match configuration did not match any metadata."
         case .noActions:
             return "A rule must have at least one emit action."
+        case .skipWithWrite:
+            return "A rule with a 'skip' emit cannot have write actions."
+        case .skipNotAlone:
+            return "A 'skip' emit must be the only action in the emit array."
         }
     }
 
@@ -57,7 +67,7 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
         case .invalidPattern:
             return "Check the regular expression syntax and fix any errors."
         case .unknownAction:
-            let valid = ["add", "remove", "replace", "removeField", "clone"].joined(separator: ", ")
+            let valid = RuleValidator.validActions.sorted().joined(separator: ", ")
             return "Use one of the supported actions: \(valid)."
         case .missingValues(let action):
             switch action {
@@ -74,6 +84,10 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
             return "Adjust the match pattern so it matches the intended metadata field."
         case .noActions:
             return "Add at least one emit configuration to the rule."
+        case .skipWithWrite:
+            return "Remove all write actions when using 'skip', or remove the 'skip' emit."
+        case .skipNotAlone:
+            return "Use 'skip' as the only emit in a rule. Move other actions to a separate rule."
         }
     }
 
@@ -96,6 +110,10 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
         case (.noMatch, .noMatch):
             return true
         case (.noActions, .noActions):
+            return true
+        case (.skipWithWrite, .skipWithWrite):
+            return true
+        case (.skipNotAlone, .skipNotAlone):
             return true
         default:
             return false

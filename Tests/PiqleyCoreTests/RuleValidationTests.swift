@@ -31,14 +31,83 @@ struct RuleValidationTests {
 
     // MARK: - RuleValidator.validActions
 
-    @Test func validActionsContainsAllFive() {
+    @Test func validActionsContainsAllSix() {
         let actions = RuleValidator.validActions
         #expect(actions.contains("add"))
         #expect(actions.contains("remove"))
         #expect(actions.contains("replace"))
         #expect(actions.contains("removeField"))
         #expect(actions.contains("clone"))
-        #expect(actions.count == 5)
+        #expect(actions.contains("skip"))
+        #expect(actions.count == 6)
+    }
+
+    // MARK: - Skip Validation
+
+    @Test func validActionsContainsSkip() {
+        #expect(RuleValidator.validActions.contains("skip"))
+        #expect(RuleValidator.validActions.count == 6)
+    }
+
+    @Test func emitSkipValid() {
+        let emit = makeEmit(action: "skip", field: nil, values: nil)
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isSuccess(result))
+    }
+
+    @Test func emitSkipRejectsField() {
+        let emit = makeEmit(action: "skip", field: "tags", values: nil)
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isFailure(result, .conflictingFields(action: "skip")))
+    }
+
+    @Test func emitSkipRejectsValues() {
+        let emit = makeEmit(action: "skip", field: nil, values: ["x"])
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isFailure(result, .conflictingFields(action: "skip")))
+    }
+
+    @Test func emitSkipRejectsReplacements() {
+        let emit = EmitConfig(action: "skip", field: nil, values: nil, replacements: [Replacement(pattern: "a", replacement: "b")], source: nil)
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isFailure(result, .conflictingFields(action: "skip")))
+    }
+
+    @Test func emitSkipRejectsSource() {
+        let emit = makeEmit(action: "skip", field: nil, values: nil, source: "original:IPTC:Keywords")
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isFailure(result, .conflictingFields(action: "skip")))
+    }
+
+    @Test func validateRuleSkipWithWriteRejected() {
+        let rule = Rule(
+            match: MatchConfig(field: "original:IPTC:Keywords", pattern: "glob:*Draft*"),
+            emit: [EmitConfig(action: "skip", field: nil, values: nil, replacements: nil, source: nil)],
+            write: [EmitConfig(action: nil, field: "tags", values: ["x"], replacements: nil, source: nil)]
+        )
+        let result = RuleValidator.validateRule(rule)
+        #expect(isFailure(result, .skipWithWrite))
+    }
+
+    @Test func validateRuleSkipNotAlone() {
+        let rule = Rule(
+            match: MatchConfig(field: "original:IPTC:Keywords", pattern: "glob:*Draft*"),
+            emit: [
+                EmitConfig(action: "skip", field: nil, values: nil, replacements: nil, source: nil),
+                EmitConfig(action: nil, field: "tags", values: ["x"], replacements: nil, source: nil)
+            ]
+        )
+        let result = RuleValidator.validateRule(rule)
+        #expect(isFailure(result, .skipNotAlone))
+    }
+
+    @Test func validateRuleNonSkipPassesValidation() {
+        let rule = Rule(
+            match: MatchConfig(field: "original:IPTC:Keywords", pattern: "glob:*"),
+            emit: [EmitConfig(action: nil, field: "tags", values: ["x"], replacements: nil, source: nil)]
+        )
+        let result = RuleValidator.validateRule(rule)
+        #expect(isSuccess(result))
     }
 
     // MARK: - validateMatch — valid cases

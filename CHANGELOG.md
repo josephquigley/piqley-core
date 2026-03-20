@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `RuleValidator.validateRule(_:)` for rule-level validation of skip constraints
+- `RuleValidationError.skipWithWrite` and `.skipNotAlone` cases
+- `"skip"` action in `RuleValidator.validActions` (now 6 actions total)
 - `EmitConfig.field` is now optional (`String?`) to support actions that require no target field (e.g. "skip")
 - `ReservedName.skip` and `ReservedName.skipRecords` constants
 - `StageConfig` type for per-stage plugin configuration

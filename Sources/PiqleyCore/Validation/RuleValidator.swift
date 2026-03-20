@@ -4,7 +4,7 @@ import Foundation
 public enum RuleValidator {
 
     /// The complete set of supported emit action strings.
-    public static let validActions: Set<String> = ["add", "remove", "replace", "removeField", "clone"]
+    public static let validActions: Set<String> = ["add", "remove", "replace", "removeField", "clone", "skip"]
 
     // MARK: - validateMatch
 
@@ -88,8 +88,38 @@ public enum RuleValidator {
                 return .failure(.missingSource)
             }
 
+        case "skip":
+            // skip must have no field, values, replacements, or source
+            if emit.field != nil || emit.values != nil || emit.replacements != nil || emit.source != nil {
+                return .failure(.conflictingFields(action: action))
+            }
+
         default:
             break
+        }
+
+        return .success(())
+    }
+
+    // MARK: - validateRule
+
+    /// Validates a rule for structural correctness, including skip-specific constraints.
+    ///
+    /// - Parameter rule: The rule to validate.
+    /// - Returns: `.success(())` if valid, or a `.failure` with the specific error.
+    public static func validateRule(_ rule: Rule) -> Result<Void, RuleValidationError> {
+        let hasSkip = rule.emit.contains { $0.action == "skip" }
+
+        guard hasSkip else {
+            return .success(())
+        }
+
+        if !rule.write.isEmpty {
+            return .failure(.skipWithWrite)
+        }
+
+        if rule.emit.count > 1 {
+            return .failure(.skipNotAlone)
         }
 
         return .success(())
