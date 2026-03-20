@@ -4,10 +4,13 @@ public struct MatchConfig: Codable, Sendable, Equatable {
     public let field: String
     /// The regex pattern to match against the field value.
     public let pattern: String
+    /// When true, inverts the match so the rule fires on non-matching values.
+    public let not: Bool?
 
-    public init(field: String, pattern: String) {
+    public init(field: String, pattern: String, not: Bool? = nil) {
         self.field = field
         self.pattern = pattern
+        self.not = not
     }
 }
 
@@ -36,13 +39,16 @@ public struct EmitConfig: Codable, Sendable, Equatable {
     public let replacements: [Replacement]?
     /// Source namespace:field reference for clone action.
     public let source: String?
+    /// When true, inverts the emit so it applies to non-matching values.
+    public let not: Bool?
 
-    public init(action: String?, field: String?, values: [String]?, replacements: [Replacement]?, source: String?) {
+    public init(action: String?, field: String?, values: [String]?, replacements: [Replacement]?, source: String?, not: Bool? = nil) {
         self.action = action
         self.field = field
         self.values = values
         self.replacements = replacements
         self.source = source
+        self.not = not
     }
 }
 

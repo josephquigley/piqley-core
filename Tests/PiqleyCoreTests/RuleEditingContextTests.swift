@@ -118,13 +118,14 @@ struct RuleEditingContextTests {
     @Test func validActionsReturnsAllSix() {
         let ctx = makeContext()
         let actions = ctx.validActions()
-        #expect(actions.count == 6)
+        #expect(actions.count == 7)
         #expect(actions.contains("add"))
         #expect(actions.contains("remove"))
         #expect(actions.contains("replace"))
         #expect(actions.contains("removeField"))
         #expect(actions.contains("clone"))
         #expect(actions.contains("skip"))
+        #expect(actions.contains("writeBack"))
     }
 
     @Test func validActionsReturnsSortedArray() {

@@ -24,9 +24,10 @@ struct RuleValidationTests {
         field: String? = "Keywords",
         values: [String]? = ["foo"],
         replacements: [Replacement]? = nil,
-        source: String? = nil
+        source: String? = nil,
+        not: Bool? = nil
     ) -> EmitConfig {
-        EmitConfig(action: action, field: field, values: values, replacements: replacements, source: source)
+        EmitConfig(action: action, field: field, values: values, replacements: replacements, source: source, not: not)
     }
 
     // MARK: - RuleValidator.validActions
@@ -39,14 +40,14 @@ struct RuleValidationTests {
         #expect(actions.contains("removeField"))
         #expect(actions.contains("clone"))
         #expect(actions.contains("skip"))
-        #expect(actions.count == 6)
+        #expect(actions.count == 7)
     }
 
     // MARK: - Skip Validation
 
     @Test func validActionsContainsSkip() {
         #expect(RuleValidator.validActions.contains("skip"))
-        #expect(RuleValidator.validActions.count == 6)
+        #expect(RuleValidator.validActions.count == 7)
     }
 
     @Test func emitSkipValid() {
@@ -475,6 +476,98 @@ struct RuleValidationTests {
         let config = EmitConfig(action: "skip", field: nil, values: nil, replacements: nil, source: nil)
         #expect(config.field == nil)
         #expect(config.action == "skip")
+    }
+
+    // MARK: - MatchConfig not field
+
+    @Test func matchConfigNotFieldDecodes() throws {
+        let json = #"{"field":"Keywords","pattern":"glob:*","not":true}"#
+        let decoded = try JSONDecoder().decode(MatchConfig.self, from: Data(json.utf8))
+        #expect(decoded.not == true)
+        #expect(decoded.field == "Keywords")
+        #expect(decoded.pattern == "glob:*")
+        let reEncoded = try JSONEncoder().encode(decoded)
+        let reDecoded = try JSONDecoder().decode(MatchConfig.self, from: reEncoded)
+        #expect(reDecoded == decoded)
+    }
+
+    // MARK: - Emit not validation
+
+    @Test func emitNotOnRemoveValid() {
+        let emit = makeEmit(action: "remove", values: ["foo"], not: true)
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isSuccess(result))
+    }
+
+    @Test func emitNotOnRemoveFieldValid() {
+        let emit = makeEmit(action: "removeField", values: nil, not: true)
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isSuccess(result))
+    }
+
+    @Test func emitNotOnAddRejected() {
+        let emit = makeEmit(action: nil, values: ["foo"], not: true)
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isFailure(result, .notNotAllowed(action: "add")))
+    }
+
+    @Test func emitNotOnCloneRejected() {
+        let emit = makeEmit(action: "clone", field: "Keywords", values: nil, source: "exif:Keywords", not: true)
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isFailure(result, .notNotAllowed(action: "clone")))
+    }
+
+    @Test func emitNotOnSkipRejected() {
+        let emit = makeEmit(action: "skip", field: nil, values: nil, not: true)
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isFailure(result, .notNotAllowed(action: "skip")))
+    }
+
+    // MARK: - writeBack validation
+
+    @Test func writeBackValid() {
+        let emit = makeEmit(action: "writeBack", field: nil, values: nil)
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isSuccess(result))
+    }
+
+    @Test func writeBackWithFieldRejected() {
+        let emit = makeEmit(action: "writeBack", field: "Keywords", values: nil)
+        let result = RuleValidator.validateEmit(emit)
+        #expect(isFailure(result, .conflictingFields(action: "writeBack")))
+    }
+
+    @Test func writeBackInEmitRejected() {
+        let rule = Rule(
+            match: MatchConfig(field: "original:IPTC:Keywords", pattern: "glob:*"),
+            emit: [EmitConfig(action: "writeBack", field: nil, values: nil, replacements: nil, source: nil)],
+            write: []
+        )
+        let result = RuleValidator.validateRule(rule)
+        #expect(isFailure(result, .writeBackInEmit))
+    }
+
+    @Test func writeBackNotAlone() {
+        let rule = Rule(
+            match: MatchConfig(field: "original:IPTC:Keywords", pattern: "glob:*"),
+            emit: [EmitConfig(action: nil, field: "tags", values: ["x"], replacements: nil, source: nil)],
+            write: [
+                EmitConfig(action: "writeBack", field: nil, values: nil, replacements: nil, source: nil),
+                EmitConfig(action: nil, field: "IPTC:Keywords", values: ["y"], replacements: nil, source: nil)
+            ]
+        )
+        let result = RuleValidator.validateRule(rule)
+        #expect(isFailure(result, .writeBackNotAlone))
+    }
+
+    @Test func writeBackAloneInWriteValid() {
+        let rule = Rule(
+            match: MatchConfig(field: "original:IPTC:Keywords", pattern: "glob:*"),
+            emit: [EmitConfig(action: nil, field: "tags", values: ["x"], replacements: nil, source: nil)],
+            write: [EmitConfig(action: "writeBack", field: nil, values: nil, replacements: nil, source: nil)]
+        )
+        let result = RuleValidator.validateRule(rule)
+        #expect(isSuccess(result))
     }
 
     // MARK: - Private helpers

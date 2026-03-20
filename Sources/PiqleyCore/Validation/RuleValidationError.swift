@@ -33,6 +33,15 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
     /// A skip emit was combined with other emit actions in the same rule.
     case skipNotAlone
 
+    /// The `not` flag was used with an action that does not support negation.
+    case notNotAllowed(action: String)
+
+    /// A writeBack emit appeared in the emit array instead of write.
+    case writeBackInEmit
+
+    /// A writeBack emit was combined with other actions in the write array.
+    case writeBackNotAlone
+
     // MARK: - LocalizedError
 
     public var errorDescription: String? {
@@ -57,6 +66,12 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
             return "A rule with a 'skip' emit cannot have write actions."
         case .skipNotAlone:
             return "A 'skip' emit must be the only action in the emit array."
+        case .notNotAllowed(let action):
+            return "The 'not' flag is not supported on the '\(action)' action."
+        case .writeBackInEmit:
+            return "A 'writeBack' action must appear in the write array, not emit."
+        case .writeBackNotAlone:
+            return "A 'writeBack' action must be the only action in the write array."
         }
     }
 
@@ -88,6 +103,12 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
             return "Remove all write actions when using 'skip', or remove the 'skip' emit."
         case .skipNotAlone:
             return "Use 'skip' as the only emit in a rule. Move other actions to a separate rule."
+        case .notNotAllowed:
+            return "The 'not' flag is only supported on 'remove' and 'removeField' actions."
+        case .writeBackInEmit:
+            return "Move the 'writeBack' action to the 'write' array."
+        case .writeBackNotAlone:
+            return "Use 'writeBack' as the only action in the write array. Move other write actions to a separate rule."
         }
     }
 
@@ -114,6 +135,12 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
         case (.skipWithWrite, .skipWithWrite):
             return true
         case (.skipNotAlone, .skipNotAlone):
+            return true
+        case (.notNotAllowed(let l), .notNotAllowed(let r)):
+            return l == r
+        case (.writeBackInEmit, .writeBackInEmit):
+            return true
+        case (.writeBackNotAlone, .writeBackNotAlone):
             return true
         default:
             return false

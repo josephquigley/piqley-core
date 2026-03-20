@@ -4,7 +4,7 @@ import Foundation
 public enum RuleValidator {
 
     /// The complete set of supported emit action strings.
-    public static let validActions: Set<String> = ["add", "remove", "replace", "removeField", "clone", "skip"]
+    public static let validActions: Set<String> = ["add", "remove", "replace", "removeField", "clone", "skip", "writeBack"]
 
     // MARK: - validateMatch
 
@@ -94,8 +94,22 @@ public enum RuleValidator {
                 return .failure(.conflictingFields(action: action))
             }
 
+        case "writeBack":
+            // writeBack must have no field, values, replacements, or source
+            if emit.field != nil || emit.values != nil || emit.replacements != nil || emit.source != nil {
+                return .failure(.conflictingFields(action: action))
+            }
+
         default:
             break
+        }
+
+        if let not = emit.not, not {
+            let effectiveAction = emit.action ?? "add"
+            let allowedNotActions: Set<String> = ["remove", "removeField"]
+            if !allowedNotActions.contains(effectiveAction) {
+                return .failure(.notNotAllowed(action: effectiveAction))
+            }
         }
 
         return .success(())
@@ -109,6 +123,16 @@ public enum RuleValidator {
     /// - Returns: `.success(())` if valid, or a `.failure` with the specific error.
     public static func validateRule(_ rule: Rule) -> Result<Void, RuleValidationError> {
         let hasSkip = rule.emit.contains { $0.action == "skip" }
+        let hasWriteBackInEmit = rule.emit.contains { $0.action == "writeBack" }
+        let hasWriteBackInWrite = rule.write.contains { $0.action == "writeBack" }
+
+        if hasWriteBackInEmit {
+            return .failure(.writeBackInEmit)
+        }
+
+        if hasWriteBackInWrite && rule.write.count > 1 {
+            return .failure(.writeBackNotAlone)
+        }
 
         guard hasSkip else {
             return .success(())

@@ -17,9 +17,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `ManifestValidator` rejects `conversionFormat` when `supportedFormats` is not also set
 - `skipped: [SkipRecord]` field on `PluginInputPayload` for backwards-compatible propagation of skipped images via the wire payload
 - `SkipRecord` type for representing a skipped image in the pipeline wire payload
+- `not: Bool?` property on `MatchConfig` for inverted matching
+- `not: Bool?` property on `EmitConfig` for inverted emit (remove/removeField only)
+- `"writeBack"` action in `RuleValidator.validActions` (now 7 actions total)
+- `RuleValidationError.notNotAllowed`, `.writeBackInEmit`, and `.writeBackNotAlone` cases
+- `RuleValidator.validateRule(_:)` validates writeBack placement (write-only, must be alone)
 - `RuleValidator.validateRule(_:)` for rule-level validation of skip constraints
 - `RuleValidationError.skipWithWrite` and `.skipNotAlone` cases
-- `"skip"` action in `RuleValidator.validActions` (now 6 actions total)
+- `"skip"` action in `RuleValidator.validActions`
 - `EmitConfig.field` is now optional (`String?`) to support actions that require no target field (e.g. "skip")
 - `ReservedName.skip` and `ReservedName.skipRecords` constants
 - `StageConfig` type for per-stage plugin configuration
