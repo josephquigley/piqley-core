@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `SkipRecord` type for representing a skipped image in the pipeline wire payload
 - `RuleValidator.validateRule(_:)` for rule-level validation of skip constraints
 - `RuleValidationError.skipWithWrite` and `.skipNotAlone` cases
 - `"skip"` action in `RuleValidator.validActions` (now 6 actions total)
