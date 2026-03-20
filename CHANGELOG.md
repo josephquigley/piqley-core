@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+### Fixed
+
+- `ManifestValidator` now rejects `skip` (alongside `original`) as a reserved plugin identifier
+
 ### Added
 
 - `skipped: [SkipRecord]` field on `PluginInputPayload` for backwards-compatible propagation of skipped images via the wire payload

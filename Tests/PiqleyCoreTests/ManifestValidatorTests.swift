@@ -56,4 +56,16 @@ struct ManifestValidatorTests {
         let errors = ManifestValidator.validate(manifest)
         #expect(errors.isEmpty)
     }
+
+    @Test func reservedIdentifierOriginalFails() {
+        let manifest = makeManifest(identifier: "original")
+        let errors = ManifestValidator.validate(manifest)
+        #expect(errors.contains { $0.contains("reserved") })
+    }
+
+    @Test func reservedIdentifierSkipFails() {
+        let manifest = makeManifest(identifier: "skip")
+        let errors = ManifestValidator.validate(manifest)
+        #expect(errors.contains { $0.contains("reserved") })
+    }
 }

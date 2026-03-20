@@ -9,6 +9,11 @@ public enum ManifestValidator {
             errors.append("Plugin identifier must not be empty.")
         }
 
+        let reservedIdentifiers: Set<String> = [ReservedName.original, ReservedName.skip]
+        if reservedIdentifiers.contains(manifest.identifier) {
+            errors.append("Plugin identifier '\(manifest.identifier)' is reserved and cannot be used.")
+        }
+
         if manifest.name.isEmpty {
             errors.append("Plugin name must not be empty.")
         }
