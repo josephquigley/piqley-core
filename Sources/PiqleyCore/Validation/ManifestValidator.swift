@@ -27,6 +27,10 @@ public enum ManifestValidator {
             errors.append("Unsupported schema version '\(manifest.pluginSchemaVersion)' (supported: \(supported)).")
         }
 
+        if manifest.conversionFormat != nil && manifest.supportedFormats == nil {
+            errors.append("conversionFormat requires supportedFormats.")
+        }
+
         return errors
     }
 }

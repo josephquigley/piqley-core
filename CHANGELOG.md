@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `supportedFormats` and `conversionFormat` optional fields on `PluginManifest` for image format declarations
+- `fork` optional field on `HookConfig` for parallel execution support
+- `ManifestValidator` rejects `conversionFormat` when `supportedFormats` is not also set
 - `skipped: [SkipRecord]` field on `PluginInputPayload` for backwards-compatible propagation of skipped images via the wire payload
 - `SkipRecord` type for representing a skipped image in the pipeline wire payload
 - `RuleValidator.validateRule(_:)` for rule-level validation of skip constraints

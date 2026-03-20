@@ -11,6 +11,8 @@ public struct PluginManifest: Codable, Sendable, Equatable {
     public let config: [ConfigEntry]
     public let setup: SetupConfig?
     public let dependencies: [PluginDependency]?
+    public let supportedFormats: [String]?
+    public let conversionFormat: String?
 
     /// The set of schema versions this build of PiqleyCore supports.
     public static let supportedSchemaVersions: Set<String> = ["1"]
@@ -23,7 +25,9 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         pluginVersion: SemanticVersion? = nil,
         config: [ConfigEntry] = [],
         setup: SetupConfig? = nil,
-        dependencies: [PluginDependency]? = nil
+        dependencies: [PluginDependency]? = nil,
+        supportedFormats: [String]? = nil,
+        conversionFormat: String? = nil
     ) {
         self.identifier = identifier
         self.name = name
@@ -33,12 +37,15 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         self.config = config
         self.setup = setup
         self.dependencies = dependencies
+        self.supportedFormats = supportedFormats
+        self.conversionFormat = conversionFormat
     }
 
     private enum CodingKeys: String, CodingKey {
         case identifier, name, description
         case pluginSchemaVersion, pluginProtocolVersion, pluginVersion
         case config, setup, dependencies
+        case supportedFormats, conversionFormat
     }
 
     public init(from decoder: any Decoder) throws {
@@ -58,6 +65,8 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         } else {
             dependencies = nil
         }
+        supportedFormats = try container.decodeIfPresent([String].self, forKey: .supportedFormats)
+        conversionFormat = try container.decodeIfPresent(String.self, forKey: .conversionFormat)
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -70,6 +79,8 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         try container.encode(config, forKey: .config)
         try container.encodeIfPresent(setup, forKey: .setup)
         try container.encodeIfPresent(dependencies, forKey: .dependencies)
+        try container.encodeIfPresent(supportedFormats, forKey: .supportedFormats)
+        try container.encodeIfPresent(conversionFormat, forKey: .conversionFormat)
     }
 
     /// The dependency identifiers as plain strings.

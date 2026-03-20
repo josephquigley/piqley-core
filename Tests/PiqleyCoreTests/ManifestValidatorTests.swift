@@ -10,12 +10,16 @@ struct ManifestValidatorTests {
     func makeManifest(
         identifier: String = "com.test.my-plugin",
         name: String = "MyPlugin",
-        pluginSchemaVersion: String = "1"
+        pluginSchemaVersion: String = "1",
+        supportedFormats: [String]? = nil,
+        conversionFormat: String? = nil
     ) -> PluginManifest {
         PluginManifest(
             identifier: identifier,
             name: name,
-            pluginSchemaVersion: pluginSchemaVersion
+            pluginSchemaVersion: pluginSchemaVersion,
+            supportedFormats: supportedFormats,
+            conversionFormat: conversionFormat
         )
     }
 
@@ -67,5 +71,25 @@ struct ManifestValidatorTests {
         let manifest = makeManifest(identifier: "skip")
         let errors = ManifestValidator.validate(manifest)
         #expect(errors.contains { $0.contains("reserved") })
+    }
+
+    // MARK: - Format validation
+
+    @Test func conversionFormatWithoutSupportedFormats() {
+        let manifest = makeManifest(conversionFormat: "jpeg")
+        let errors = ManifestValidator.validate(manifest)
+        #expect(errors.contains { $0.contains("conversionFormat requires supportedFormats") })
+    }
+
+    @Test func conversionFormatWithSupportedFormats() {
+        let manifest = makeManifest(supportedFormats: ["raw", "jpeg"], conversionFormat: "jpeg")
+        let errors = ManifestValidator.validate(manifest)
+        #expect(errors.isEmpty)
+    }
+
+    @Test func supportedFormatsAlone() {
+        let manifest = makeManifest(supportedFormats: ["raw", "jpeg"])
+        let errors = ManifestValidator.validate(manifest)
+        #expect(errors.isEmpty)
     }
 }
