@@ -32,7 +32,7 @@ All types are `Codable` and `Sendable`.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/josephquigley/piqley-cli-core.git", from: "0.1.0")
+    .package(url: "https://github.com/josephquigley/piqley-core.git", from: "0.1.0")
 ]
 ```
 
