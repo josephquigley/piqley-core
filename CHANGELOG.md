@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - `ManifestValidator` now rejects `skip` (alongside `original`) as a reserved plugin identifier
+- `RuleEditingContext.stageNames()` now returns stages in canonical pipeline execution order instead of alphabetical
 
 ### Added
 

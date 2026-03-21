@@ -144,10 +144,11 @@ struct RuleEditingContextTests {
         #expect(names.count == 2)
     }
 
-    @Test func stageNamesReturnsSorted() {
+    @Test func stageNamesReturnsCanonicalOrderThenAlphabetical() {
         let ctx = makeContext()
         let names = ctx.stageNames()
-        #expect(names == names.sorted())
+        // Non-canonical names should be sorted alphabetically
+        #expect(names == ["export", "ingest"])
     }
 
     // MARK: - rules(forStage:slot:)

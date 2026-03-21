@@ -53,9 +53,15 @@ public struct RuleEditingContext: Sendable {
         RuleValidator.validActions.sorted()
     }
 
-    /// Returns all loaded stage names in sorted order.
+    /// Returns all loaded stage names in canonical pipeline execution order,
+    /// with any non-canonical names appended alphabetically.
     public func stageNames() -> [String] {
-        stages.keys.sorted()
+        let canonicalOrder = Hook.canonicalOrder.map(\.rawValue)
+        let canonicalSet = Set(canonicalOrder)
+        var result = canonicalOrder.filter { stages.keys.contains($0) }
+        let nonCanonical = stages.keys.filter { !canonicalSet.contains($0) }.sorted()
+        result.append(contentsOf: nonCanonical)
+        return result
     }
 
     /// Returns the rules for the given stage and slot.
