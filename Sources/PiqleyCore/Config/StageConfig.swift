@@ -18,4 +18,12 @@ public struct StageConfig: Codable, Sendable, Equatable {
     public var isEmpty: Bool {
         preRules == nil && binary == nil && postRules == nil
     }
+
+    /// Whether the stage has no meaningful content: no rules and no non-empty command.
+    /// A binary with an empty command string is treated as empty.
+    public var isEffectivelyEmpty: Bool {
+        let hasRules = !(preRules ?? []).isEmpty || !(postRules ?? []).isEmpty
+        let hasCommand = binary?.command != nil && !(binary?.command?.isEmpty ?? true)
+        return !hasRules && !hasCommand
+    }
 }
