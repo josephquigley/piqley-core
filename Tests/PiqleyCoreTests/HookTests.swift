@@ -7,6 +7,10 @@ struct HookTests {
 
     // MARK: - Raw values
 
+    @Test func rawValuePipelineStart() {
+        #expect(Hook.pipelineStart.rawValue == "pipeline-start")
+    }
+
     @Test func rawValuePreProcess() {
         #expect(Hook.preProcess.rawValue == "pre-process")
     }
@@ -21,6 +25,10 @@ struct HookTests {
 
     @Test func rawValuePostPublish() {
         #expect(Hook.postPublish.rawValue == "post-publish")
+    }
+
+    @Test func rawValuePipelineFinished() {
+        #expect(Hook.pipelineFinished.rawValue == "pipeline-finished")
     }
 
     // MARK: - Codable
@@ -43,6 +51,18 @@ struct HookTests {
         #expect(hook == .postPublish)
     }
 
+    @Test func decodePipelineStart() throws {
+        let json = #""pipeline-start""#
+        let hook = try JSONDecoder().decode(Hook.self, from: Data(json.utf8))
+        #expect(hook == .pipelineStart)
+    }
+
+    @Test func decodePipelineFinished() throws {
+        let json = #""pipeline-finished""#
+        let hook = try JSONDecoder().decode(Hook.self, from: Data(json.utf8))
+        #expect(hook == .pipelineFinished)
+    }
+
     @Test func roundTripAllCases() throws {
         for hook in Hook.allCases {
             let data = try JSONEncoder().encode(hook)
@@ -54,21 +74,23 @@ struct HookTests {
     // MARK: - allCases count
 
     @Test func allCasesCount() {
-        #expect(Hook.allCases.count == 4)
+        #expect(Hook.allCases.count == 6)
     }
 
     // MARK: - canonicalOrder
 
     @Test func canonicalOrderLength() {
-        #expect(Hook.canonicalOrder.count == 4)
+        #expect(Hook.canonicalOrder.count == 6)
     }
 
     @Test func canonicalOrderSequence() {
         #expect(Hook.canonicalOrder == [
+            .pipelineStart,
             .preProcess,
             .postProcess,
             .publish,
-            .postPublish
+            .postPublish,
+            .pipelineFinished
         ])
     }
 }

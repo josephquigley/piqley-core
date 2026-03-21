@@ -24,6 +24,8 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
     public let lastExecutedVersion: SemanticVersion?
     /// Images that were skipped during pipeline processing.
     public let skipped: [SkipRecord]
+    /// Unique identifier for the current pipeline run.
+    public let pipelineRunId: String?
 
     public init(
         hook: String,
@@ -37,7 +39,8 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
         state: [String: [String: [String: JSONValue]]]?,
         pluginVersion: SemanticVersion,
         lastExecutedVersion: SemanticVersion?,
-        skipped: [SkipRecord] = []
+        skipped: [SkipRecord] = [],
+        pipelineRunId: String? = nil
     ) {
         self.hook = hook
         self.imageFolderPath = imageFolderPath
@@ -51,6 +54,7 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
         self.pluginVersion = pluginVersion
         self.lastExecutedVersion = lastExecutedVersion
         self.skipped = skipped
+        self.pipelineRunId = pipelineRunId
     }
 
     public init(from decoder: any Decoder) throws {
@@ -67,5 +71,6 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
         pluginVersion = try container.decode(SemanticVersion.self, forKey: .pluginVersion)
         lastExecutedVersion = try container.decodeIfPresent(SemanticVersion.self, forKey: .lastExecutedVersion)
         skipped = try container.decodeIfPresent([SkipRecord].self, forKey: .skipped) ?? []
+        pipelineRunId = try container.decodeIfPresent(String.self, forKey: .pipelineRunId)
     }
 }

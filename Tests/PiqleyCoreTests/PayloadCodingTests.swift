@@ -34,6 +34,7 @@ struct PayloadCodingTests {
         #expect(decoded.state == nil)
         #expect(decoded.pluginVersion == SemanticVersion(major: 1, minor: 2, patch: 3))
         #expect(decoded.lastExecutedVersion == nil)
+        #expect(decoded.pipelineRunId == nil)
     }
 
     @Test func encodeDecodeInputPayloadWithState() throws {
@@ -60,6 +61,45 @@ struct PayloadCodingTests {
         #expect(decoded.dryRun == true)
         #expect(decoded.state?["pluginA"]?["folder1"]?["count"] == .number(5))
         #expect(decoded.lastExecutedVersion == SemanticVersion(major: 1, minor: 9, patch: 0))
+    }
+
+    @Test func encodeDecodeInputPayloadWithPipelineRunId() throws {
+        let payload = PluginInputPayload(
+            hook: "pipeline-start",
+            imageFolderPath: "/data/folder",
+            pluginConfig: [:],
+            secrets: [:],
+            executionLogPath: "/logs/exec.log",
+            dataPath: "/data",
+            logPath: "/logs/plugin.log",
+            dryRun: false,
+            state: nil,
+            pluginVersion: SemanticVersion(major: 1, minor: 0, patch: 0),
+            lastExecutedVersion: nil,
+            pipelineRunId: "550e8400-e29b-41d4-a716-446655440000"
+        )
+        let data = try JSONEncoder().encode(payload)
+        let decoded = try JSONDecoder().decode(PluginInputPayload.self, from: data)
+        #expect(decoded.pipelineRunId == "550e8400-e29b-41d4-a716-446655440000")
+        #expect(decoded.hook == "pipeline-start")
+    }
+
+    @Test func decodeInputPayloadWithoutPipelineRunIdBackwardsCompatible() throws {
+        let json = """
+        {
+            "hook": "pre-process",
+            "imageFolderPath": "/data/folder",
+            "pluginConfig": {},
+            "secrets": {},
+            "executionLogPath": "/logs/exec.log",
+            "dataPath": "/data",
+            "logPath": "/logs/plugin.log",
+            "dryRun": false,
+            "pluginVersion": "1.0.0"
+        }
+        """
+        let payload = try JSONDecoder().decode(PluginInputPayload.self, from: json.data(using: .utf8)!)
+        #expect(payload.pipelineRunId == nil)
     }
 
     // MARK: - PluginOutputLine

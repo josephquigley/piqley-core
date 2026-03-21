@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `pipelineStart` and `pipelineFinished` lifecycle hooks on `Hook` enum for pipeline boundary events
+- `pipelineRunId: String?` field on `PluginInputPayload` for per-run identification (backwards-compatible)
 - `supportedFormats` and `conversionFormat` optional fields on `PluginManifest` for image format declarations
 - `fork` optional field on `HookConfig` for parallel execution support
 - `ManifestValidator` rejects `conversionFormat` when `supportedFormats` is not also set
