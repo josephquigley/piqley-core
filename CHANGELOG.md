@@ -16,7 +16,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - `PluginDirectory` constants (`bin`, `data`, `logs`) for shared access across CLI and SDK
 - `supportedPlatforms: [String]?` property on `PluginManifest` for multi-platform plugin support
-- Schema version "2" added to `supportedSchemaVersions`
 - `StageRegistry` data model for managing custom pipeline stages with persistence, validation, and mutation methods (add, activate, deactivate, remove, reorder, rename, auto-register)
 - `Hook.defaultStageNames` for seeding the stage registry with canonical defaults
 - `pipelineStart` and `pipelineFinished` lifecycle hooks on `Hook` enum for pipeline boundary events
@@ -52,6 +51,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- Reverted `supportedSchemaVersions` back to `["1"]`; no version bump needed without production consumers
 - Renamed `pluginProtocolVersion` to `pluginSchemaVersion` with version validation
 - Renamed `folderPath` to `imageFolderPath` in plugin input payload
 - Migrated `PluginManifest.dependencies` to structured `PluginDependency` type

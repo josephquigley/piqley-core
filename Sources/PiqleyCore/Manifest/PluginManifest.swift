@@ -16,7 +16,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
     public let supportedPlatforms: [String]?
 
     /// The set of schema versions this build of PiqleyCore supports.
-    public static let supportedSchemaVersions: Set<String> = ["1", "2"]
+    public static let supportedSchemaVersions: Set<String> = ["1"]
 
     public init(
         identifier: String,
