@@ -13,9 +13,10 @@ public struct PluginManifest: Codable, Sendable, Equatable {
     public let dependencies: [PluginDependency]?
     public let supportedFormats: [String]?
     public let conversionFormat: String?
+    public let supportedPlatforms: [String]?
 
     /// The set of schema versions this build of PiqleyCore supports.
-    public static let supportedSchemaVersions: Set<String> = ["1"]
+    public static let supportedSchemaVersions: Set<String> = ["1", "2"]
 
     public init(
         identifier: String,
@@ -27,7 +28,8 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         setup: SetupConfig? = nil,
         dependencies: [PluginDependency]? = nil,
         supportedFormats: [String]? = nil,
-        conversionFormat: String? = nil
+        conversionFormat: String? = nil,
+        supportedPlatforms: [String]? = nil
     ) {
         self.identifier = identifier
         self.name = name
@@ -39,13 +41,14 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         self.dependencies = dependencies
         self.supportedFormats = supportedFormats
         self.conversionFormat = conversionFormat
+        self.supportedPlatforms = supportedPlatforms
     }
 
     private enum CodingKeys: String, CodingKey {
         case identifier, name, description
         case pluginSchemaVersion, pluginProtocolVersion, pluginVersion
         case config, setup, dependencies
-        case supportedFormats, conversionFormat
+        case supportedFormats, conversionFormat, supportedPlatforms
     }
 
     public init(from decoder: any Decoder) throws {
@@ -65,6 +68,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         } else {
             dependencies = nil
         }
+        supportedPlatforms = try container.decodeIfPresent([String].self, forKey: .supportedPlatforms)
         supportedFormats = try container.decodeIfPresent([String].self, forKey: .supportedFormats)
         conversionFormat = try container.decodeIfPresent(String.self, forKey: .conversionFormat)
     }
@@ -79,6 +83,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         try container.encode(config, forKey: .config)
         try container.encodeIfPresent(setup, forKey: .setup)
         try container.encodeIfPresent(dependencies, forKey: .dependencies)
+        try container.encodeIfPresent(supportedPlatforms, forKey: .supportedPlatforms)
         try container.encodeIfPresent(supportedFormats, forKey: .supportedFormats)
         try container.encodeIfPresent(conversionFormat, forKey: .conversionFormat)
     }

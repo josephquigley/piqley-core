@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `supportedPlatforms: [String]?` property on `PluginManifest` for multi-platform plugin support
+- Schema version "2" added to `supportedSchemaVersions`
 - `StageRegistry` data model for managing custom pipeline stages with persistence, validation, and mutation methods (add, activate, deactivate, remove, reorder, rename, auto-register)
 - `Hook.defaultStageNames` for seeding the stage registry with canonical defaults
 - `pipelineStart` and `pipelineFinished` lifecycle hooks on `Hook` enum for pipeline boundary events
