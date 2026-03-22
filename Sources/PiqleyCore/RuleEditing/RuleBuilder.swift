@@ -36,6 +36,19 @@ public struct RuleBuilder: Sendable {
         return result
     }
 
+    /// Validates and stores a match configuration with an optional negation flag.
+    ///
+    /// On success the match is stored and replaces any previously stored match.
+    /// On failure the match state is unchanged.
+    @discardableResult
+    public mutating func setMatch(field: String, pattern: String, not: Bool?) -> Result<Void, RuleValidationError> {
+        let result = context.validateMatch(field: field, pattern: pattern)
+        if case .success = result {
+            match = MatchConfig(field: field, pattern: pattern, not: not)
+        }
+        return result
+    }
+
     /// Validates and appends an emit action.
     ///
     /// On success the config is appended to the emit list.
