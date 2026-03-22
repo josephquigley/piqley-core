@@ -67,4 +67,84 @@ public struct StageRegistry: Codable, Sendable {
         guard !name.hasPrefix("-"), !name.hasSuffix("-") else { return false }
         return name.unicodeScalars.allSatisfy { allowedCharacters.contains($0) }
     }
+
+    // MARK: - Mutations
+
+    public mutating func addStage(_ name: String, at index: Int) throws {
+        guard Self.isValidName(name) else { throw StageRegistryError.invalidName(name) }
+        guard !isKnown(name) else { throw StageRegistryError.stageAlreadyExists(name) }
+        guard index >= 0, index <= active.count else { throw StageRegistryError.indexOutOfBounds }
+        active.insert(StageEntry(name: name), at: index)
+    }
+
+    public mutating func activate(_ name: String, at index: Int) throws {
+        guard let availIdx = available.firstIndex(where: { $0.name == name }) else {
+            throw StageRegistryError.stageNotFound(name)
+        }
+        guard index >= 0, index <= active.count else { throw StageRegistryError.indexOutOfBounds }
+        let entry = available.remove(at: availIdx)
+        active.insert(entry, at: index)
+    }
+
+    public mutating func deactivate(_ name: String) throws {
+        guard let idx = active.firstIndex(where: { $0.name == name }) else {
+            throw StageRegistryError.stageNotFound(name)
+        }
+        let entry = active.remove(at: idx)
+        available.append(entry)
+    }
+
+    public mutating func removeStage(_ name: String) throws {
+        if let idx = active.firstIndex(where: { $0.name == name }) {
+            active.remove(at: idx)
+        } else if let idx = available.firstIndex(where: { $0.name == name }) {
+            available.remove(at: idx)
+        } else {
+            throw StageRegistryError.stageNotFound(name)
+        }
+    }
+
+    public mutating func reorder(_ name: String, to newIndex: Int) throws {
+        guard let oldIndex = active.firstIndex(where: { $0.name == name }) else {
+            throw StageRegistryError.stageNotFound(name)
+        }
+        guard newIndex >= 0, newIndex < active.count else { throw StageRegistryError.indexOutOfBounds }
+        let entry = active.remove(at: oldIndex)
+        active.insert(entry, at: newIndex)
+    }
+
+    public mutating func renameStage(_ oldName: String, to newName: String) throws {
+        guard Self.isValidName(newName) else { throw StageRegistryError.invalidName(newName) }
+        guard !isKnown(newName) else { throw StageRegistryError.stageAlreadyExists(newName) }
+        if let idx = active.firstIndex(where: { $0.name == oldName }) {
+            active[idx].name = newName
+        } else if let idx = available.firstIndex(where: { $0.name == oldName }) {
+            available[idx].name = newName
+        } else {
+            throw StageRegistryError.stageNotFound(oldName)
+        }
+    }
+
+    /// Register an unknown stage name into the available list.
+    /// No-op if the name is already known.
+    public mutating func autoRegister(_ name: String) {
+        guard !isKnown(name) else { return }
+        available.append(StageEntry(name: name))
+    }
+}
+
+public enum StageRegistryError: Error, CustomStringConvertible {
+    case stageNotFound(String)
+    case stageAlreadyExists(String)
+    case invalidName(String)
+    case indexOutOfBounds
+
+    public var description: String {
+        switch self {
+        case let .stageNotFound(name): "Stage '\(name)' not found"
+        case let .stageAlreadyExists(name): "Stage '\(name)' already exists"
+        case let .invalidName(name): "'\(name)' is not a valid stage name"
+        case .indexOutOfBounds: "Index out of bounds"
+        }
+    }
 }
