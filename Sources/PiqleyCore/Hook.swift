@@ -16,4 +16,7 @@ public enum Hook: String, CaseIterable, Codable, Sendable {
         .postPublish,
         .pipelineFinished
     ]
+
+    /// Default stage names used to seed the stage registry.
+    public static let defaultStageNames: [String] = canonicalOrder.map(\.rawValue)
 }

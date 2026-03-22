@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `StageRegistry` data model for managing custom pipeline stages with persistence and validation
+- `Hook.defaultStageNames` for seeding the stage registry with canonical defaults
 - `pipelineStart` and `pipelineFinished` lifecycle hooks on `Hook` enum for pipeline boundary events
 - `pipelineRunId: String?` field on `PluginInputPayload` for per-run identification (backwards-compatible)
 - `supportedFormats` and `conversionFormat` optional fields on `PluginManifest` for image format declarations
