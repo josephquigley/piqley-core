@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `skipped: [SkipRecord]` field on `PluginInputPayload` for backwards-compatible propagation of skipped images via the wire payload
 - `SkipRecord` type for representing a skipped image in the pipeline wire payload
 - `not: Bool?` property on `MatchConfig` for inverted matching
+- `RuleBuilder.setMatch(field:pattern:not:)` overload for explicit negation flag setting during rule construction
 - `not: Bool?` property on `EmitConfig` for inverted emit (remove/removeField only)
 - `"writeBack"` action in `RuleValidator.validActions` (now 7 actions total)
 - `RuleValidationError.notNotAllowed`, `.writeBackInEmit`, and `.writeBackNotAlone` cases

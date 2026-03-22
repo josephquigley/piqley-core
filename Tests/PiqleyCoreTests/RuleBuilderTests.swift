@@ -249,4 +249,33 @@ struct RuleBuilderTests {
             Issue.record("Expected .success with updated match field, got \(result)")
         }
     }
+
+    // MARK: - setMatch with not flag
+
+    @Test func setMatchWithNotFlagPreservesNegation() {
+        var builder = RuleBuilder(context: makeContext())
+        let result = builder.setMatch(field: "Keywords", pattern: "portrait", not: true)
+        #expect(isSuccess(result))
+        _ = builder.addEmit(makeEmit())
+
+        let buildResult = builder.build()
+        if case .success(let rule) = buildResult {
+            #expect(rule.match.not == true)
+        } else {
+            Issue.record("Expected .success, got \(buildResult)")
+        }
+    }
+
+    @Test func setMatchWithNotNilOmitsFlag() {
+        var builder = RuleBuilder(context: makeContext())
+        _ = builder.setMatch(field: "Keywords", pattern: "portrait", not: nil)
+        _ = builder.addEmit(makeEmit())
+
+        let buildResult = builder.build()
+        if case .success(let rule) = buildResult {
+            #expect(rule.match.not == nil)
+        } else {
+            Issue.record("Expected .success, got \(buildResult)")
+        }
+    }
 }
