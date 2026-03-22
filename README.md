@@ -21,7 +21,7 @@ PiqleyCore is the foundational Swift library that defines the plugin architectur
 
 ## What's Inside
 
-- **Plugin manifest types** — `PluginManifest`, hooks, config schema, setup declarations
+- **Plugin manifest types** — `PluginManifest`, hooks, config schema, setup declarations, platform support
 - **Plugin I/O** — `PluginInputPayload` and `PluginOutputLine` for stdin/stdout communication
 - **Configuration** — `PluginConfig`, typed values, secrets, and declarative metadata rules
 - **Supporting types** — `SemanticVersion`, `JSONValue`, `ConfigValueType`
