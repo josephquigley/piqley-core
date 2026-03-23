@@ -13,7 +13,7 @@ struct StageRegistryTests {
 
     @Test func seedsDefaultsWhenFileMissing() throws {
         let registry = try StageRegistry.load(from: tempDir)
-        #expect(registry.active.map(\.name) == Hook.defaultStageNames)
+        #expect(registry.active.map(\.name) == StandardHook.defaultStageNames)
         #expect(registry.available.isEmpty)
     }
 

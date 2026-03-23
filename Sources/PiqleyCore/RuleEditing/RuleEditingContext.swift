@@ -56,7 +56,7 @@ public struct RuleEditingContext: Sendable {
     /// Returns all loaded stage names in canonical pipeline execution order,
     /// with any non-canonical names appended alphabetically.
     public func stageNames() -> [String] {
-        let canonicalOrder = Hook.canonicalOrder.map(\.rawValue)
+        let canonicalOrder = StandardHook.canonicalOrder.map(\.rawValue)
         let canonicalSet = Set(canonicalOrder)
         var result = canonicalOrder.filter { stages.keys.contains($0) }
         let nonCanonical = stages.keys.filter { !canonicalSet.contains($0) }.sorted()

@@ -26,7 +26,7 @@ public struct StageRegistry: Codable, Sendable {
         let file = directory.appendingPathComponent(fileName)
         guard FileManager.default.fileExists(atPath: file.path) else {
             let seeded = StageRegistry(
-                active: Hook.defaultStageNames.map { StageEntry(name: $0) },
+                active: StandardHook.defaultStageNames.map { StageEntry(name: $0) },
                 available: []
             )
             try seeded.save(to: directory)

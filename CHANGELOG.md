@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `Hook` protocol with `stageConfig` requirement, enabling plugins to define custom hooks as enums
+- `StandardHook` enum conforming to `Hook` with the 6 built-in pipeline hooks
 - `PluginDirectory` constants (`bin`, `data`, `logs`) for shared access across CLI and SDK
 - `supportedPlatforms: [String]?` property on `PluginManifest` for multi-platform plugin support
 - `StageRegistry` data model for managing custom pipeline stages with persistence, validation, and mutation methods (add, activate, deactivate, remove, reorder, rename, auto-register)
@@ -51,6 +53,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- **BREAKING:** `Hook` is now a protocol instead of an enum. The 6 built-in hooks move to `StandardHook`. All references to `Hook.canonicalOrder`, `Hook.defaultStageNames`, and `Hook.allCases` must use `StandardHook` instead.
 - Reverted `supportedSchemaVersions` back to `["1"]`; no version bump needed without production consumers
 - Renamed `pluginProtocolVersion` to `pluginSchemaVersion` with version validation
 - Renamed `folderPath` to `imageFolderPath` in plugin input payload
