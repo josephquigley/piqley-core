@@ -135,4 +135,65 @@ struct JSONValueTests {
         let value: JSONValue = ["key": "value"]
         #expect(value == .object(["key": .string("value")]))
     }
+
+    // MARK: - Convenience accessors
+
+    @Test func stringValueReturnsString() {
+        #expect(JSONValue.string("hello").stringValue == "hello")
+    }
+
+    @Test func stringValueReturnsNilForNonString() {
+        #expect(JSONValue.number(42).stringValue == nil)
+        #expect(JSONValue.bool(true).stringValue == nil)
+        #expect(JSONValue.null.stringValue == nil)
+    }
+
+    @Test func numberValueReturnsDouble() {
+        #expect(JSONValue.number(3.14).numberValue == 3.14)
+    }
+
+    @Test func numberValueReturnsNilForNonNumber() {
+        #expect(JSONValue.string("42").numberValue == nil)
+        #expect(JSONValue.bool(true).numberValue == nil)
+    }
+
+    @Test func boolValueReturnsBool() {
+        #expect(JSONValue.bool(true).boolValue == true)
+        #expect(JSONValue.bool(false).boolValue == false)
+    }
+
+    @Test func boolValueReturnsNilForNonBool() {
+        #expect(JSONValue.string("true").boolValue == nil)
+        #expect(JSONValue.number(1).boolValue == nil)
+    }
+
+    @Test func arrayValueReturnsArray() {
+        let arr: [JSONValue] = [.number(1), .string("two")]
+        #expect(JSONValue.array(arr).arrayValue == arr)
+    }
+
+    @Test func arrayValueReturnsNilForNonArray() {
+        #expect(JSONValue.string("[]").arrayValue == nil)
+    }
+
+    @Test func objectValueReturnsObject() {
+        let obj: [String: JSONValue] = ["key": .string("value")]
+        #expect(JSONValue.object(obj).objectValue == obj)
+    }
+
+    @Test func objectValueReturnsNilForNonObject() {
+        #expect(JSONValue.string("{}").objectValue == nil)
+    }
+
+    @Test func intValueReturnsInt() {
+        #expect(JSONValue.number(42).intValue == 42)
+    }
+
+    @Test func intValueReturnsNilForNonNumber() {
+        #expect(JSONValue.string("42").intValue == nil)
+    }
+
+    @Test func intValueReturnsNilForNonIntegerNumber() {
+        #expect(JSONValue.number(3.14).intValue == nil)
+    }
 }

@@ -54,6 +54,49 @@ extension JSONValue: Codable {
     }
 }
 
+// MARK: - Convenience accessors
+
+extension JSONValue {
+    /// Returns the wrapped `String` if this is `.string`, otherwise `nil`.
+    public var stringValue: String? {
+        if case .string(let v) = self { return v }
+        return nil
+    }
+
+    /// Returns the wrapped `Double` if this is `.number`, otherwise `nil`.
+    public var numberValue: Double? {
+        if case .number(let v) = self { return v }
+        return nil
+    }
+
+    /// Returns the wrapped `Int` if this is `.number` with an integer value, otherwise `nil`.
+    public var intValue: Int? {
+        guard case .number(let v) = self,
+              v == v.rounded(.towardZero),
+              v >= Double(Int.min),
+              v <= Double(Int.max) else { return nil }
+        return Int(v)
+    }
+
+    /// Returns the wrapped `Bool` if this is `.bool`, otherwise `nil`.
+    public var boolValue: Bool? {
+        if case .bool(let v) = self { return v }
+        return nil
+    }
+
+    /// Returns the wrapped `[JSONValue]` if this is `.array`, otherwise `nil`.
+    public var arrayValue: [JSONValue]? {
+        if case .array(let v) = self { return v }
+        return nil
+    }
+
+    /// Returns the wrapped `[String: JSONValue]` if this is `.object`, otherwise `nil`.
+    public var objectValue: [String: JSONValue]? {
+        if case .object(let v) = self { return v }
+        return nil
+    }
+}
+
 // MARK: - ExpressibleBy conformances
 
 extension JSONValue: ExpressibleByStringLiteral {

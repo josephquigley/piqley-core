@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- Convenience accessors on `JSONValue`: `stringValue`, `numberValue`, `intValue`, `boolValue`, `arrayValue`, `objectValue`
 - `Hook` protocol with `stageConfig` requirement, enabling plugins to define custom hooks as enums
 - `StandardHook` enum conforming to `Hook` with the 6 built-in pipeline hooks
 - `PluginDirectory` constants (`bin`, `data`, `logs`) for shared access across CLI and SDK
