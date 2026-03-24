@@ -33,14 +33,12 @@ public struct StageRegistry: Codable, Sendable {
             return seeded
         }
         let data = try Data(contentsOf: file)
-        return try JSONDecoder().decode(StageRegistry.self, from: data)
+        return try JSONDecoder.piqley.decode(StageRegistry.self, from: data)
     }
 
     public func save(to directory: URL) throws {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let data = try encoder.encode(self)
+        let data = try JSONEncoder.piqleyPrettyPrint.encode(self)
         try data.write(to: directory.appendingPathComponent(Self.fileName), options: .atomic)
     }
 

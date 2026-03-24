@@ -23,32 +23,32 @@ struct ConfigValueTypeTests {
 
     @Test func decodeString() throws {
         let json = #""string""#
-        let value = try JSONDecoder().decode(ConfigValueType.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(ConfigValueType.self, from: Data(json.utf8))
         #expect(value == .string)
     }
 
     @Test func decodeInt() throws {
         let json = #""int""#
-        let value = try JSONDecoder().decode(ConfigValueType.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(ConfigValueType.self, from: Data(json.utf8))
         #expect(value == .int)
     }
 
     @Test func decodeFloat() throws {
         let json = #""float""#
-        let value = try JSONDecoder().decode(ConfigValueType.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(ConfigValueType.self, from: Data(json.utf8))
         #expect(value == .float)
     }
 
     @Test func decodeBool() throws {
         let json = #""bool""#
-        let value = try JSONDecoder().decode(ConfigValueType.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(ConfigValueType.self, from: Data(json.utf8))
         #expect(value == .bool)
     }
 
     @Test func roundTrip() throws {
         for type_ in [ConfigValueType.string, .int, .float, .bool] {
-            let data = try JSONEncoder().encode(type_)
-            let decoded = try JSONDecoder().decode(ConfigValueType.self, from: data)
+            let data = try JSONEncoder.piqley.encode(type_)
+            let decoded = try JSONDecoder.piqley.decode(ConfigValueType.self, from: data)
             #expect(decoded == type_)
         }
     }
@@ -67,20 +67,20 @@ struct PluginProtocolTests {
 
     @Test func decodeJSON() throws {
         let json = #""json""#
-        let value = try JSONDecoder().decode(PluginProtocol.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(PluginProtocol.self, from: Data(json.utf8))
         #expect(value == .json)
     }
 
     @Test func decodePipe() throws {
         let json = #""pipe""#
-        let value = try JSONDecoder().decode(PluginProtocol.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(PluginProtocol.self, from: Data(json.utf8))
         #expect(value == .pipe)
     }
 
     @Test func roundTrip() throws {
         for proto in [PluginProtocol.json, .pipe] {
-            let data = try JSONEncoder().encode(proto)
-            let decoded = try JSONDecoder().decode(PluginProtocol.self, from: data)
+            let data = try JSONEncoder.piqley.encode(proto)
+            let decoded = try JSONDecoder.piqley.decode(PluginProtocol.self, from: data)
             #expect(decoded == proto)
         }
     }

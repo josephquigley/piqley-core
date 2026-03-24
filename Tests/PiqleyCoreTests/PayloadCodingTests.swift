@@ -21,8 +21,8 @@ struct PayloadCodingTests {
             pluginVersion: SemanticVersion(major: 1, minor: 2, patch: 3),
             lastExecutedVersion: nil
         )
-        let data = try JSONEncoder().encode(payload)
-        let decoded = try JSONDecoder().decode(PluginInputPayload.self, from: data)
+        let data = try JSONEncoder.piqley.encode(payload)
+        let decoded = try JSONDecoder.piqley.decode(PluginInputPayload.self, from: data)
         #expect(decoded.hook == "pre-process")
         #expect(decoded.imageFolderPath == "/data/folder")
         #expect(decoded.pluginConfig["apiUrl"] == .string("https://example.com"))
@@ -56,8 +56,8 @@ struct PayloadCodingTests {
             pluginVersion: SemanticVersion(major: 2, minor: 0, patch: 0),
             lastExecutedVersion: SemanticVersion(major: 1, minor: 9, patch: 0)
         )
-        let data = try JSONEncoder().encode(payload)
-        let decoded = try JSONDecoder().decode(PluginInputPayload.self, from: data)
+        let data = try JSONEncoder.piqley.encode(payload)
+        let decoded = try JSONDecoder.piqley.decode(PluginInputPayload.self, from: data)
         #expect(decoded.dryRun == true)
         #expect(decoded.state?["pluginA"]?["folder1"]?["count"] == .number(5))
         #expect(decoded.lastExecutedVersion == SemanticVersion(major: 1, minor: 9, patch: 0))
@@ -78,8 +78,8 @@ struct PayloadCodingTests {
             lastExecutedVersion: nil,
             pipelineRunId: "550e8400-e29b-41d4-a716-446655440000"
         )
-        let data = try JSONEncoder().encode(payload)
-        let decoded = try JSONDecoder().decode(PluginInputPayload.self, from: data)
+        let data = try JSONEncoder.piqley.encode(payload)
+        let decoded = try JSONDecoder.piqley.decode(PluginInputPayload.self, from: data)
         #expect(decoded.pipelineRunId == "550e8400-e29b-41d4-a716-446655440000")
         #expect(decoded.hook == "pipeline-start")
     }
@@ -98,7 +98,7 @@ struct PayloadCodingTests {
             "pluginVersion": "1.0.0"
         }
         """
-        let payload = try JSONDecoder().decode(PluginInputPayload.self, from: json.data(using: .utf8)!)
+        let payload = try JSONDecoder.piqley.decode(PluginInputPayload.self, from: json.data(using: .utf8)!)
         #expect(payload.pipelineRunId == nil)
     }
 
@@ -106,7 +106,7 @@ struct PayloadCodingTests {
 
     @Test func decodeOutputLineResult() throws {
         let json = #"{"type": "result", "success": true, "message": "Done"}"#
-        let line = try JSONDecoder().decode(PluginOutputLine.self, from: Data(json.utf8))
+        let line = try JSONDecoder.piqley.decode(PluginOutputLine.self, from: Data(json.utf8))
         #expect(line.type == "result")
         #expect(line.success == true)
         #expect(line.message == "Done")
@@ -117,7 +117,7 @@ struct PayloadCodingTests {
 
     @Test func decodeOutputLineProgress() throws {
         let json = #"{"type": "progress", "message": "Processing 3 of 10"}"#
-        let line = try JSONDecoder().decode(PluginOutputLine.self, from: Data(json.utf8))
+        let line = try JSONDecoder.piqley.decode(PluginOutputLine.self, from: Data(json.utf8))
         #expect(line.type == "progress")
         #expect(line.message == "Processing 3 of 10")
         #expect(line.success == nil)
@@ -125,7 +125,7 @@ struct PayloadCodingTests {
 
     @Test func decodeOutputLineImageResult() throws {
         let json = #"{"type": "imageResult", "filename": "photo.jpg", "success": true}"#
-        let line = try JSONDecoder().decode(PluginOutputLine.self, from: Data(json.utf8))
+        let line = try JSONDecoder.piqley.decode(PluginOutputLine.self, from: Data(json.utf8))
         #expect(line.type == "imageResult")
         #expect(line.filename == "photo.jpg")
         #expect(line.success == true)
@@ -133,7 +133,7 @@ struct PayloadCodingTests {
 
     @Test func decodeOutputLineImageResultWithError() throws {
         let json = #"{"type": "imageResult", "filename": "bad.jpg", "success": false, "error": "File not found"}"#
-        let line = try JSONDecoder().decode(PluginOutputLine.self, from: Data(json.utf8))
+        let line = try JSONDecoder.piqley.decode(PluginOutputLine.self, from: Data(json.utf8))
         #expect(line.type == "imageResult")
         #expect(line.filename == "bad.jpg")
         #expect(line.success == false)

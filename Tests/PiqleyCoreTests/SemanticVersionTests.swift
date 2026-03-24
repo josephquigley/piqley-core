@@ -115,21 +115,21 @@ struct SemanticVersionTests {
 
     @Test func codableRoundTrip() throws {
         let original = try SemanticVersion("3.14.159")
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(SemanticVersion.self, from: data)
+        let data = try JSONEncoder.piqley.encode(original)
+        let decoded = try JSONDecoder.piqley.decode(SemanticVersion.self, from: data)
         #expect(decoded == original)
     }
 
     @Test func encodesAsString() throws {
         let version = try SemanticVersion("1.2.3")
-        let data = try JSONEncoder().encode(version)
+        let data = try JSONEncoder.piqley.encode(version)
         let string = String(data: data, encoding: .utf8)
         #expect(string == #""1.2.3""#)
     }
 
     @Test func decodesFromString() throws {
         let json = #""2.0.1""#
-        let version = try JSONDecoder().decode(SemanticVersion.self, from: Data(json.utf8))
+        let version = try JSONDecoder.piqley.decode(SemanticVersion.self, from: Data(json.utf8))
         #expect(version.major == 2)
         #expect(version.minor == 0)
         #expect(version.patch == 1)

@@ -482,12 +482,12 @@ struct RuleValidationTests {
 
     @Test func matchConfigNotFieldDecodes() throws {
         let json = #"{"field":"Keywords","pattern":"glob:*","not":true}"#
-        let decoded = try JSONDecoder().decode(MatchConfig.self, from: Data(json.utf8))
+        let decoded = try JSONDecoder.piqley.decode(MatchConfig.self, from: Data(json.utf8))
         #expect(decoded.not == true)
         #expect(decoded.field == "Keywords")
         #expect(decoded.pattern == "glob:*")
-        let reEncoded = try JSONEncoder().encode(decoded)
-        let reDecoded = try JSONDecoder().decode(MatchConfig.self, from: reEncoded)
+        let reEncoded = try JSONEncoder.piqley.encode(decoded)
+        let reDecoded = try JSONDecoder.piqley.decode(MatchConfig.self, from: reEncoded)
         #expect(reDecoded == decoded)
     }
 

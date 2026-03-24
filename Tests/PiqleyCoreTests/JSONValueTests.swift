@@ -9,49 +9,49 @@ struct JSONValueTests {
 
     @Test func decodeString() throws {
         let json = #""hello""#
-        let value = try JSONDecoder().decode(JSONValue.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(JSONValue.self, from: Data(json.utf8))
         #expect(value == .string("hello"))
     }
 
     @Test func decodeNumber() throws {
         let json = "42.5"
-        let value = try JSONDecoder().decode(JSONValue.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(JSONValue.self, from: Data(json.utf8))
         #expect(value == .number(42.5))
     }
 
     @Test func decodeIntAsNumber() throws {
         let json = "7"
-        let value = try JSONDecoder().decode(JSONValue.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(JSONValue.self, from: Data(json.utf8))
         #expect(value == .number(7))
     }
 
     @Test func decodeBoolTrue() throws {
         let json = "true"
-        let value = try JSONDecoder().decode(JSONValue.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(JSONValue.self, from: Data(json.utf8))
         #expect(value == .bool(true))
     }
 
     @Test func decodeBoolFalse() throws {
         let json = "false"
-        let value = try JSONDecoder().decode(JSONValue.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(JSONValue.self, from: Data(json.utf8))
         #expect(value == .bool(false))
     }
 
     @Test func decodeNull() throws {
         let json = "null"
-        let value = try JSONDecoder().decode(JSONValue.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(JSONValue.self, from: Data(json.utf8))
         #expect(value == .null)
     }
 
     @Test func decodeArray() throws {
         let json = #"[1, "two", true]"#
-        let value = try JSONDecoder().decode(JSONValue.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(JSONValue.self, from: Data(json.utf8))
         #expect(value == .array([.number(1), .string("two"), .bool(true)]))
     }
 
     @Test func decodeObject() throws {
         let json = #"{"key": "value"}"#
-        let value = try JSONDecoder().decode(JSONValue.self, from: Data(json.utf8))
+        let value = try JSONDecoder.piqley.decode(JSONValue.self, from: Data(json.utf8))
         #expect(value == .object(["key": .string("value")]))
     }
 
@@ -59,43 +59,43 @@ struct JSONValueTests {
 
     @Test func roundTripString() throws {
         let original = JSONValue.string("hello")
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(JSONValue.self, from: data)
+        let data = try JSONEncoder.piqley.encode(original)
+        let decoded = try JSONDecoder.piqley.decode(JSONValue.self, from: data)
         #expect(decoded == original)
     }
 
     @Test func roundTripNumber() throws {
         let original = JSONValue.number(3.14)
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(JSONValue.self, from: data)
+        let data = try JSONEncoder.piqley.encode(original)
+        let decoded = try JSONDecoder.piqley.decode(JSONValue.self, from: data)
         #expect(decoded == original)
     }
 
     @Test func roundTripBool() throws {
         let original = JSONValue.bool(false)
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(JSONValue.self, from: data)
+        let data = try JSONEncoder.piqley.encode(original)
+        let decoded = try JSONDecoder.piqley.decode(JSONValue.self, from: data)
         #expect(decoded == original)
     }
 
     @Test func roundTripNull() throws {
         let original = JSONValue.null
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(JSONValue.self, from: data)
+        let data = try JSONEncoder.piqley.encode(original)
+        let decoded = try JSONDecoder.piqley.decode(JSONValue.self, from: data)
         #expect(decoded == original)
     }
 
     @Test func roundTripArray() throws {
         let original = JSONValue.array([.number(1), .string("two"), .bool(true), .null])
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(JSONValue.self, from: data)
+        let data = try JSONEncoder.piqley.encode(original)
+        let decoded = try JSONDecoder.piqley.decode(JSONValue.self, from: data)
         #expect(decoded == original)
     }
 
     @Test func roundTripObject() throws {
         let original = JSONValue.object(["a": .number(1), "b": .string("hi")])
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(JSONValue.self, from: data)
+        let data = try JSONEncoder.piqley.encode(original)
+        let decoded = try JSONDecoder.piqley.decode(JSONValue.self, from: data)
         #expect(decoded == original)
     }
 

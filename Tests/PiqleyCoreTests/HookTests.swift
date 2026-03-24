@@ -34,39 +34,39 @@ struct HookTests {
     // MARK: - Codable
 
     @Test func encodePreProcess() throws {
-        let data = try JSONEncoder().encode(StandardHook.preProcess)
+        let data = try JSONEncoder.piqley.encode(StandardHook.preProcess)
         let string = String(data: data, encoding: .utf8)
         #expect(string == #""pre-process""#)
     }
 
     @Test func decodePreProcess() throws {
         let json = #""pre-process""#
-        let hook = try JSONDecoder().decode(StandardHook.self, from: Data(json.utf8))
+        let hook = try JSONDecoder.piqley.decode(StandardHook.self, from: Data(json.utf8))
         #expect(hook == .preProcess)
     }
 
     @Test func decodePostPublish() throws {
         let json = #""post-publish""#
-        let hook = try JSONDecoder().decode(StandardHook.self, from: Data(json.utf8))
+        let hook = try JSONDecoder.piqley.decode(StandardHook.self, from: Data(json.utf8))
         #expect(hook == .postPublish)
     }
 
     @Test func decodePipelineStart() throws {
         let json = #""pipeline-start""#
-        let hook = try JSONDecoder().decode(StandardHook.self, from: Data(json.utf8))
+        let hook = try JSONDecoder.piqley.decode(StandardHook.self, from: Data(json.utf8))
         #expect(hook == .pipelineStart)
     }
 
     @Test func decodePipelineFinished() throws {
         let json = #""pipeline-finished""#
-        let hook = try JSONDecoder().decode(StandardHook.self, from: Data(json.utf8))
+        let hook = try JSONDecoder.piqley.decode(StandardHook.self, from: Data(json.utf8))
         #expect(hook == .pipelineFinished)
     }
 
     @Test func roundTripAllCases() throws {
         for hook in StandardHook.allCases {
-            let data = try JSONEncoder().encode(hook)
-            let decoded = try JSONDecoder().decode(StandardHook.self, from: data)
+            let data = try JSONEncoder.piqley.encode(hook)
+            let decoded = try JSONDecoder.piqley.decode(StandardHook.self, from: data)
             #expect(decoded == hook)
         }
     }

@@ -9,7 +9,7 @@ struct ManifestCodingTests {
 
     @Test func decodeValueEntry() throws {
         let json = #"{"key": "myKey", "type": "string", "value": "hello"}"#
-        let entry = try JSONDecoder().decode(ConfigEntry.self, from: Data(json.utf8))
+        let entry = try JSONDecoder.piqley.decode(ConfigEntry.self, from: Data(json.utf8))
         guard case .value(let key, let type_, let value) = entry else {
             Issue.record("Expected .value case")
             return
@@ -21,7 +21,7 @@ struct ManifestCodingTests {
 
     @Test func decodeValueEntryWithDefault() throws {
         let json = #"{"key": "count", "type": "int", "value": 42}"#
-        let entry = try JSONDecoder().decode(ConfigEntry.self, from: Data(json.utf8))
+        let entry = try JSONDecoder.piqley.decode(ConfigEntry.self, from: Data(json.utf8))
         guard case .value(let key, let type_, let value) = entry else {
             Issue.record("Expected .value case")
             return
@@ -33,7 +33,7 @@ struct ManifestCodingTests {
 
     @Test func decodeSecretEntry() throws {
         let json = #"{"secret_key": "API_TOKEN", "type": "string"}"#
-        let entry = try JSONDecoder().decode(ConfigEntry.self, from: Data(json.utf8))
+        let entry = try JSONDecoder.piqley.decode(ConfigEntry.self, from: Data(json.utf8))
         guard case .secret(let secretKey, let type_) = entry else {
             Issue.record("Expected .secret case")
             return
@@ -45,21 +45,21 @@ struct ManifestCodingTests {
     @Test func decodeBothKeysThrows() throws {
         let json = #"{"key": "foo", "secret_key": "BAR", "type": "string", "value": "x"}"#
         #expect(throws: (any Error).self) {
-            try JSONDecoder().decode(ConfigEntry.self, from: Data(json.utf8))
+            try JSONDecoder.piqley.decode(ConfigEntry.self, from: Data(json.utf8))
         }
     }
 
     @Test func decodeNeitherKeyThrows() throws {
         let json = #"{"type": "string", "value": "x"}"#
         #expect(throws: (any Error).self) {
-            try JSONDecoder().decode(ConfigEntry.self, from: Data(json.utf8))
+            try JSONDecoder.piqley.decode(ConfigEntry.self, from: Data(json.utf8))
         }
     }
 
     @Test func encodeRoundTripValue() throws {
         let original = ConfigEntry.value(key: "myKey", type: .string, value: .string("hello"))
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(ConfigEntry.self, from: data)
+        let data = try JSONEncoder.piqley.encode(original)
+        let decoded = try JSONDecoder.piqley.decode(ConfigEntry.self, from: data)
         guard case .value(let key, let type_, let value) = decoded else {
             Issue.record("Expected .value case")
             return
@@ -71,8 +71,8 @@ struct ManifestCodingTests {
 
     @Test func encodeRoundTripSecret() throws {
         let original = ConfigEntry.secret(secretKey: "API_TOKEN", type: .string)
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(ConfigEntry.self, from: data)
+        let data = try JSONEncoder.piqley.encode(original)
+        let decoded = try JSONDecoder.piqley.decode(ConfigEntry.self, from: data)
         guard case .secret(let secretKey, let type_) = decoded else {
             Issue.record("Expected .secret case")
             return
@@ -96,7 +96,7 @@ struct ManifestCodingTests {
             "batchProxy": {}
         }
         """
-        let hook = try JSONDecoder().decode(HookConfig.self, from: Data(json.utf8))
+        let hook = try JSONDecoder.piqley.decode(HookConfig.self, from: Data(json.utf8))
         #expect(hook.command == "/usr/bin/plugin")
         #expect(hook.args == ["--verbose", "--output", "json"])
         #expect(hook.timeout == 30)
@@ -109,7 +109,7 @@ struct ManifestCodingTests {
 
     @Test func decodeMinimalHookConfig() throws {
         let json = "{}"
-        let hook = try JSONDecoder().decode(HookConfig.self, from: Data(json.utf8))
+        let hook = try JSONDecoder.piqley.decode(HookConfig.self, from: Data(json.utf8))
         #expect(hook.command == nil)
         #expect(hook.args == [])
         #expect(hook.timeout == nil)
@@ -124,14 +124,14 @@ struct ManifestCodingTests {
 
     @Test func decodeSetupConfigWithArgs() throws {
         let json = #"{"command": "setup.sh", "args": ["--init"]}"#
-        let setup = try JSONDecoder().decode(SetupConfig.self, from: Data(json.utf8))
+        let setup = try JSONDecoder.piqley.decode(SetupConfig.self, from: Data(json.utf8))
         #expect(setup.command == "setup.sh")
         #expect(setup.args == ["--init"])
     }
 
     @Test func decodeSetupConfigWithoutArgs() throws {
         let json = #"{"command": "setup.sh"}"#
-        let setup = try JSONDecoder().decode(SetupConfig.self, from: Data(json.utf8))
+        let setup = try JSONDecoder.piqley.decode(SetupConfig.self, from: Data(json.utf8))
         #expect(setup.command == "setup.sh")
         #expect(setup.args == [])
     }
@@ -140,14 +140,14 @@ struct ManifestCodingTests {
 
     @Test func decodeBatchProxyWithSort() throws {
         let json = #"{"sort": {"key": "date", "order": "ascending"}}"#
-        let proxy = try JSONDecoder().decode(BatchProxyConfig.self, from: Data(json.utf8))
+        let proxy = try JSONDecoder.piqley.decode(BatchProxyConfig.self, from: Data(json.utf8))
         #expect(proxy.sort?.key == "date")
         #expect(proxy.sort?.order == .ascending)
     }
 
     @Test func decodeBatchProxyWithoutSort() throws {
         let json = "{}"
-        let proxy = try JSONDecoder().decode(BatchProxyConfig.self, from: Data(json.utf8))
+        let proxy = try JSONDecoder.piqley.decode(BatchProxyConfig.self, from: Data(json.utf8))
         #expect(proxy.sort == nil)
     }
 
@@ -174,7 +174,7 @@ struct ManifestCodingTests {
             "dependencies": ["other-plugin"]
         }
         """
-        let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
+        let manifest = try JSONDecoder.piqley.decode(PluginManifest.self, from: Data(json.utf8))
         #expect(manifest.identifier == "com.test.my-plugin")
         #expect(manifest.name == "MyPlugin")
         #expect(manifest.description == "A test plugin.")
@@ -194,7 +194,7 @@ struct ManifestCodingTests {
             "pluginSchemaVersion": "1.0"
         }
         """
-        let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
+        let manifest = try JSONDecoder.piqley.decode(PluginManifest.self, from: Data(json.utf8))
         #expect(manifest.identifier == "com.test.minimal")
         #expect(manifest.name == "MinimalPlugin")
         #expect(manifest.description == nil)
@@ -218,7 +218,7 @@ struct ManifestCodingTests {
             ]
         }
         """
-        let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
+        let manifest = try JSONDecoder.piqley.decode(PluginManifest.self, from: Data(json.utf8))
         let keys = manifest.secretKeys
         #expect(keys.count == 2)
         #expect(keys.contains("API_TOKEN"))
@@ -238,7 +238,7 @@ struct ManifestCodingTests {
             ]
         }
         """
-        let manifest = try JSONDecoder().decode(PluginManifest.self, from: Data(json.utf8))
+        let manifest = try JSONDecoder.piqley.decode(PluginManifest.self, from: Data(json.utf8))
         let entries = manifest.valueEntries
         #expect(entries.count == 2)
         let keys = entries.map { $0.key }
@@ -256,8 +256,8 @@ struct ManifestCodingTests {
             setup: nil,
             dependencies: nil
         )
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(PluginManifest.self, from: data)
+        let data = try JSONEncoder.piqley.encode(original)
+        let decoded = try JSONDecoder.piqley.decode(PluginManifest.self, from: data)
         #expect(decoded.identifier == original.identifier)
         #expect(decoded.name == original.name)
         #expect(decoded.pluginSchemaVersion == original.pluginSchemaVersion)

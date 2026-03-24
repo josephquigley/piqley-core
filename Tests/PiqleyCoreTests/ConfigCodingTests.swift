@@ -14,7 +14,7 @@ struct ConfigCodingTests {
             "emit": [{"field": "status", "values": ["draft", "wip"]}]
         }
         """
-        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
         #expect(rule.match.field == "title")
         #expect(rule.match.pattern == "^Draft")
         #expect(rule.emit[0].field == "status")
@@ -28,7 +28,7 @@ struct ConfigCodingTests {
             "emit": [{"field": "keywords", "values": ["any"]}]
         }
         """
-        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
         #expect(rule.match.field == "title")
         #expect(rule.match.pattern == ".*")
         #expect(rule.emit[0].action == nil)
@@ -41,8 +41,8 @@ struct ConfigCodingTests {
             match: MatchConfig(field: "category", pattern: "tech"),
             emit: [EmitConfig(action: nil, field: "tag", values: ["technology"], replacements: nil, source: nil)]
         )
-        let data = try JSONEncoder().encode(rule)
-        let decoded = try JSONDecoder().decode(Rule.self, from: data)
+        let data = try JSONEncoder.piqley.encode(rule)
+        let decoded = try JSONDecoder.piqley.decode(Rule.self, from: data)
         #expect(decoded.match.field == rule.match.field)
         #expect(decoded.match.pattern == rule.match.pattern)
         #expect(decoded.emit[0].field == rule.emit[0].field)
@@ -56,7 +56,7 @@ struct ConfigCodingTests {
             "emit": [{"field": "keywords", "values": ["a"]}]
         }
         """
-        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
         #expect(rule.match.field == "title")
         #expect(rule.match.pattern == "test")
     }
@@ -70,7 +70,7 @@ struct ConfigCodingTests {
             "emit": [{"action": "remove", "field": "keywords", "values": ["draft"]}]
         }
         """
-        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
         #expect(rule.emit.count == 1)
         #expect(rule.emit[0].action == "remove")
         #expect(rule.emit[0].field == "keywords")
@@ -91,7 +91,7 @@ struct ConfigCodingTests {
             }]
         }
         """
-        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
         #expect(rule.emit[0].action == "replace")
         #expect(rule.emit[0].replacements?.count == 2)
         #expect(rule.emit[0].replacements?[0].pattern == "regex:SONY(.+)")
@@ -105,7 +105,7 @@ struct ConfigCodingTests {
             "emit": [{"action": "removeField", "field": "*"}]
         }
         """
-        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
         #expect(rule.emit[0].action == "removeField")
         #expect(rule.emit[0].field == "*")
         #expect(rule.emit[0].values == nil)
@@ -121,7 +121,7 @@ struct ConfigCodingTests {
             ]
         }
         """
-        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
         #expect(rule.emit.count == 2)
         #expect(rule.emit[0].action == "removeField")
         #expect(rule.emit[1].action == nil)
@@ -132,8 +132,8 @@ struct ConfigCodingTests {
 
     @Test func encodeRoundTripCloneEmitConfig() throws {
         let config = EmitConfig(action: "clone", field: "keywords", values: nil, replacements: nil, source: "original:IPTC:Keywords")
-        let data = try JSONEncoder().encode(config)
-        let decoded = try JSONDecoder().decode(EmitConfig.self, from: data)
+        let data = try JSONEncoder.piqley.encode(config)
+        let decoded = try JSONDecoder.piqley.decode(EmitConfig.self, from: data)
         #expect(decoded.action == "clone")
         #expect(decoded.field == "keywords")
         #expect(decoded.values == nil)
@@ -145,7 +145,7 @@ struct ConfigCodingTests {
         let json = """
         { "action": "clone", "field": "*", "source": "original" }
         """
-        let config = try JSONDecoder().decode(EmitConfig.self, from: Data(json.utf8))
+        let config = try JSONDecoder.piqley.decode(EmitConfig.self, from: Data(json.utf8))
         #expect(config.action == "clone")
         #expect(config.field == "*")
         #expect(config.source == "original")
@@ -163,7 +163,7 @@ struct ConfigCodingTests {
             "write": [{"action": "add", "field": "IPTC:Keywords", "values": ["canon"]}]
         }
         """
-        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
         #expect(rule.write.count == 1)
         #expect(rule.write[0].action == "add")
         #expect(rule.write[0].field == "IPTC:Keywords")
@@ -176,7 +176,7 @@ struct ConfigCodingTests {
             "emit": [{"field": "keywords", "values": ["any"]}]
         }
         """
-        let rule = try JSONDecoder().decode(Rule.self, from: Data(json.utf8))
+        let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
         #expect(rule.write.isEmpty)
     }
 
@@ -186,8 +186,8 @@ struct ConfigCodingTests {
             emit: [EmitConfig(action: nil, field: "keywords", values: ["a"], replacements: nil, source: nil)],
             write: [EmitConfig(action: "remove", field: "IPTC:Keywords", values: ["old"], replacements: nil, source: nil)]
         )
-        let data = try JSONEncoder().encode(rule)
-        let decoded = try JSONDecoder().decode(Rule.self, from: data)
+        let data = try JSONEncoder.piqley.encode(rule)
+        let decoded = try JSONDecoder.piqley.decode(Rule.self, from: data)
         #expect(decoded.write.count == 1)
         #expect(decoded.write[0].action == "remove")
     }
@@ -207,7 +207,7 @@ struct ConfigCodingTests {
             ]
         }
         """
-        let config = try JSONDecoder().decode(PluginConfig.self, from: Data(json.utf8))
+        let config = try JSONDecoder.piqley.decode(PluginConfig.self, from: Data(json.utf8))
         #expect(config.values["apiUrl"] == .string("https://example.com"))
         #expect(config.values["retries"] == .number(3))
         #expect(config.isSetUp == true)
@@ -215,14 +215,14 @@ struct ConfigCodingTests {
 
     @Test func decodeEmptyPluginConfig() throws {
         let json = "{}"
-        let config = try JSONDecoder().decode(PluginConfig.self, from: Data(json.utf8))
+        let config = try JSONDecoder.piqley.decode(PluginConfig.self, from: Data(json.utf8))
         #expect(config.values.isEmpty)
         #expect(config.isSetUp == nil)
     }
 
     @Test func decodePluginConfigWithoutRules() throws {
         let json = #"{"values": {"key": "val"}}"#
-        let config = try JSONDecoder().decode(PluginConfig.self, from: Data(json.utf8))
+        let config = try JSONDecoder.piqley.decode(PluginConfig.self, from: Data(json.utf8))
         #expect(config.values["key"] == .string("val"))
     }
 
@@ -231,8 +231,8 @@ struct ConfigCodingTests {
             values: ["url": .string("http://example.com")],
             isSetUp: false
         )
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(PluginConfig.self, from: data)
+        let data = try JSONEncoder.piqley.encode(original)
+        let decoded = try JSONDecoder.piqley.decode(PluginConfig.self, from: data)
         #expect(decoded.values["url"] == .string("http://example.com"))
         #expect(decoded.isSetUp == false)
     }
@@ -263,7 +263,7 @@ struct ConfigCodingTests {
             ]
         }
         """
-        let stage = try JSONDecoder().decode(StageConfig.self, from: Data(json.utf8))
+        let stage = try JSONDecoder.piqley.decode(StageConfig.self, from: Data(json.utf8))
         #expect(stage.preRules?.count == 1)
         #expect(stage.preRules?[0].match.field == "original:TIFF:Model")
         #expect(stage.binary?.command == "./bin/my-plugin")
@@ -278,7 +278,7 @@ struct ConfigCodingTests {
             "binary": {"command": "./bin/tool", "timeout": 30}
         }
         """
-        let stage = try JSONDecoder().decode(StageConfig.self, from: Data(json.utf8))
+        let stage = try JSONDecoder.piqley.decode(StageConfig.self, from: Data(json.utf8))
         #expect(stage.preRules == nil)
         #expect(stage.binary?.command == "./bin/tool")
         #expect(stage.postRules == nil)
@@ -295,7 +295,7 @@ struct ConfigCodingTests {
             ]
         }
         """
-        let stage = try JSONDecoder().decode(StageConfig.self, from: Data(json.utf8))
+        let stage = try JSONDecoder.piqley.decode(StageConfig.self, from: Data(json.utf8))
         #expect(stage.preRules?.count == 1)
         #expect(stage.binary == nil)
         #expect(stage.postRules == nil)
@@ -303,7 +303,7 @@ struct ConfigCodingTests {
 
     @Test func decodeEmptyStageConfig() throws {
         let json = "{}"
-        let stage = try JSONDecoder().decode(StageConfig.self, from: Data(json.utf8))
+        let stage = try JSONDecoder.piqley.decode(StageConfig.self, from: Data(json.utf8))
         #expect(stage.preRules == nil)
         #expect(stage.binary == nil)
         #expect(stage.postRules == nil)
@@ -318,8 +318,8 @@ struct ConfigCodingTests {
             binary: HookConfig(command: "./bin/tool", timeout: 30),
             postRules: nil
         )
-        let data = try JSONEncoder().encode(stage)
-        let decoded = try JSONDecoder().decode(StageConfig.self, from: data)
+        let data = try JSONEncoder.piqley.encode(stage)
+        let decoded = try JSONDecoder.piqley.decode(StageConfig.self, from: data)
         #expect(decoded.preRules?.count == 1)
         #expect(decoded.binary?.command == "./bin/tool")
         #expect(decoded.postRules == nil)
