@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `ConsumedField` struct and `consumedFields` array on `PluginManifest` for declaring state fields a plugin works with
 - `JSONEncoder.piqley`, `JSONEncoder.piqleyPrettyPrint`, and `JSONDecoder.piqley` static extensions for unified JSON coding
 - Convenience accessors on `JSONValue`: `stringValue`, `numberValue`, `intValue`, `boolValue`, `arrayValue`, `objectValue`
 - `Hook` protocol with `stageConfig` requirement, enabling plugins to define custom hooks as enums
