@@ -98,6 +98,53 @@ struct StageRegistryTests {
         }
     }
 
+    // MARK: - Required Stage Protection
+
+    @Test func deactivateRequiredStageThrows() throws {
+        var registry = try StageRegistry.load(from: tempDir)
+        #expect(throws: StageRegistryError.self) {
+            try registry.deactivate("pipeline-start")
+        }
+        #expect(throws: StageRegistryError.self) {
+            try registry.deactivate("pipeline-finished")
+        }
+        // Non-required stages can still be deactivated
+        try registry.deactivate("pre-process")
+        #expect(!registry.active.map(\.name).contains("pre-process"))
+    }
+
+    @Test func removeRequiredStageThrows() throws {
+        var registry = try StageRegistry.load(from: tempDir)
+        #expect(throws: StageRegistryError.self) {
+            try registry.removeStage("pipeline-start")
+        }
+        #expect(throws: StageRegistryError.self) {
+            try registry.removeStage("pipeline-finished")
+        }
+        #expect(registry.active.map(\.name).contains("pipeline-start"))
+        #expect(registry.active.map(\.name).contains("pipeline-finished"))
+    }
+
+    @Test func renameRequiredStageThrows() throws {
+        var registry = try StageRegistry.load(from: tempDir)
+        #expect(throws: StageRegistryError.self) {
+            try registry.renameStage("pipeline-start", to: "my-start")
+        }
+        #expect(throws: StageRegistryError.self) {
+            try registry.renameStage("pipeline-finished", to: "my-end")
+        }
+        #expect(registry.active.map(\.name).contains("pipeline-start"))
+        #expect(registry.active.map(\.name).contains("pipeline-finished"))
+    }
+
+    @Test func isRequiredIdentifiesBookendStages() {
+        #expect(StageRegistry.isRequired("pipeline-start"))
+        #expect(StageRegistry.isRequired("pipeline-finished"))
+        #expect(!StageRegistry.isRequired("pre-process"))
+        #expect(!StageRegistry.isRequired("publish"))
+        #expect(!StageRegistry.isRequired("custom-stage"))
+    }
+
     @Test func autoRegisterAddsToAvailable() throws {
         var registry = try StageRegistry.load(from: tempDir)
         registry.autoRegister("new-stage")

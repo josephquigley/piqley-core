@@ -66,6 +66,10 @@ public struct StageRegistry: Codable, Sendable {
         return name.unicodeScalars.allSatisfy { allowedCharacters.contains($0) }
     }
 
+    public static func isRequired(_ name: String) -> Bool {
+        StandardHook.requiredStageNames.contains(name)
+    }
+
     // MARK: - Mutations
 
     public mutating func addStage(_ name: String, at index: Int) throws {
@@ -85,6 +89,7 @@ public struct StageRegistry: Codable, Sendable {
     }
 
     public mutating func deactivate(_ name: String) throws {
+        guard !Self.isRequired(name) else { throw StageRegistryError.requiredStage(name) }
         guard let idx = active.firstIndex(where: { $0.name == name }) else {
             throw StageRegistryError.stageNotFound(name)
         }
@@ -93,6 +98,7 @@ public struct StageRegistry: Codable, Sendable {
     }
 
     public mutating func removeStage(_ name: String) throws {
+        guard !Self.isRequired(name) else { throw StageRegistryError.requiredStage(name) }
         if let idx = active.firstIndex(where: { $0.name == name }) {
             active.remove(at: idx)
         } else if let idx = available.firstIndex(where: { $0.name == name }) {
@@ -112,6 +118,7 @@ public struct StageRegistry: Codable, Sendable {
     }
 
     public mutating func renameStage(_ oldName: String, to newName: String) throws {
+        guard !Self.isRequired(oldName) else { throw StageRegistryError.requiredStage(oldName) }
         guard Self.isValidName(newName) else { throw StageRegistryError.invalidName(newName) }
         guard !isKnown(newName) else { throw StageRegistryError.stageAlreadyExists(newName) }
         if let idx = active.firstIndex(where: { $0.name == oldName }) {
@@ -136,6 +143,7 @@ public enum StageRegistryError: Error, CustomStringConvertible {
     case stageAlreadyExists(String)
     case invalidName(String)
     case indexOutOfBounds
+    case requiredStage(String)
 
     public var description: String {
         switch self {
@@ -143,6 +151,7 @@ public enum StageRegistryError: Error, CustomStringConvertible {
         case let .stageAlreadyExists(name): "Stage '\(name)' already exists"
         case let .invalidName(name): "'\(name)' is not a valid stage name"
         case .indexOutOfBounds: "Index out of bounds"
+        case let .requiredStage(name): "Stage '\(name)' is required and cannot be removed or renamed"
         }
     }
 }

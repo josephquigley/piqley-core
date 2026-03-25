@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `StandardHook.requiredStages` and `requiredStageNames` identifying pipeline-start and pipeline-finished as non-removable
+- `StageRegistry.isRequired(_:)` query for checking whether a stage is protected
+- `StageRegistryError.requiredStage` error thrown when attempting to deactivate, remove, or rename a required stage
 - `ConsumedField` struct and `consumedFields` array on `PluginManifest` for declaring state fields a plugin works with
 - `JSONEncoder.piqley`, `JSONEncoder.piqleyPrettyPrint`, and `JSONDecoder.piqley` static extensions for unified JSON coding
 - Convenience accessors on `JSONValue`: `stringValue`, `numberValue`, `intValue`, `boolValue`, `arrayValue`, `objectValue`
