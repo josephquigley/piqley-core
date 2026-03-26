@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `RuleEditingContext.stageNames()` now returns stages in canonical pipeline execution order instead of alphabetical
 - `StageConfig.isEffectivelyEmpty` treats a binary with an empty command as empty
 - `PluginManifest.secretKeys` and `valueEntries` pattern matches updated for `ConfigEntry` metadata parameter
+- `ManifestCodingTests` updated for `ConfigMetadata` fields with new decode, encode, and displayLabel tests
 
 ### Added
 
