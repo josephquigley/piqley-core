@@ -16,6 +16,8 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
     public let logPath: String
     /// Whether this is a dry run (no side effects).
     public let dryRun: Bool
+    /// Whether debug output is enabled.
+    public let debug: Bool
     /// Persisted state from previous executions, keyed by plugin name, then folder path, then key.
     public let state: [String: [String: [String: JSONValue]]]?
     /// The version of this plugin.
@@ -36,6 +38,7 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
         dataPath: String,
         logPath: String,
         dryRun: Bool,
+        debug: Bool,
         state: [String: [String: [String: JSONValue]]]?,
         pluginVersion: SemanticVersion,
         lastExecutedVersion: SemanticVersion?,
@@ -50,6 +53,7 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
         self.dataPath = dataPath
         self.logPath = logPath
         self.dryRun = dryRun
+        self.debug = debug
         self.state = state
         self.pluginVersion = pluginVersion
         self.lastExecutedVersion = lastExecutedVersion
@@ -67,6 +71,7 @@ public struct PluginInputPayload: Codable, Sendable, Equatable {
         dataPath = try container.decode(String.self, forKey: .dataPath)
         logPath = try container.decode(String.self, forKey: .logPath)
         dryRun = try container.decode(Bool.self, forKey: .dryRun)
+        debug = try container.decodeIfPresent(Bool.self, forKey: .debug) ?? false
         state = try container.decodeIfPresent([String: [String: [String: JSONValue]]].self, forKey: .state)
         pluginVersion = try container.decode(SemanticVersion.self, forKey: .pluginVersion)
         lastExecutedVersion = try container.decodeIfPresent(SemanticVersion.self, forKey: .lastExecutedVersion)

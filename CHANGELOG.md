@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `debug` property on `PluginInputPayload` for forwarding the CLI `--debug` flag to plugins
 - `ConfigMetadata` struct with optional `label` and `description` fields on each `ConfigEntry` case
 - `ConfigEntry.displayLabel` convenience property that falls back to the raw key when no label is set
 - `StandardHook.requiredStages` and `requiredStageNames` identifying pipeline-start and pipeline-finished as non-removable
