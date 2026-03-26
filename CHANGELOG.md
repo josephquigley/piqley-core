@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `ManifestValidator` now rejects `skip` (alongside `original`) as a reserved plugin identifier
 - `RuleEditingContext.stageNames()` now returns stages in canonical pipeline execution order instead of alphabetical
 - `StageConfig.isEffectivelyEmpty` treats a binary with an empty command as empty
+- `PluginManifest.secretKeys` and `valueEntries` pattern matches updated for `ConfigEntry` metadata parameter
 
 ### Added
 

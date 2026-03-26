@@ -105,7 +105,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
     /// The secret environment variable keys declared in config.
     public var secretKeys: [String] {
         config.compactMap { entry in
-            if case .secret(let key, _) = entry { return key }
+            if case .secret(let key, _, _) = entry { return key }
             return nil
         }
     }
@@ -113,7 +113,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
     /// The value entries declared in config (key, type, value tuples).
     public var valueEntries: [(key: String, type: ConfigValueType, value: JSONValue)] {
         config.compactMap { entry in
-            if case .value(let key, let type_, let value) = entry {
+            if case .value(let key, let type_, let value, _) = entry {
                 return (key: key, type: type_, value: value)
             }
             return nil
