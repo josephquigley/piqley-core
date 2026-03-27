@@ -17,6 +17,7 @@ struct PayloadCodingTests {
             dataPath: "/data",
             logPath: "/logs/plugin.log",
             dryRun: false,
+            debug: false,
             state: nil,
             pluginVersion: SemanticVersion(major: 1, minor: 2, patch: 3),
             lastExecutedVersion: nil
@@ -52,6 +53,7 @@ struct PayloadCodingTests {
             dataPath: "/data",
             logPath: "/logs/plugin.log",
             dryRun: true,
+            debug: false,
             state: state,
             pluginVersion: SemanticVersion(major: 2, minor: 0, patch: 0),
             lastExecutedVersion: SemanticVersion(major: 1, minor: 9, patch: 0)
@@ -73,6 +75,7 @@ struct PayloadCodingTests {
             dataPath: "/data",
             logPath: "/logs/plugin.log",
             dryRun: false,
+            debug: false,
             state: nil,
             pluginVersion: SemanticVersion(major: 1, minor: 0, patch: 0),
             lastExecutedVersion: nil,
