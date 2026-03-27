@@ -381,7 +381,7 @@ struct ManifestCodingTests {
         #expect(manifest.type == .mutable)
     }
 
-    @Test func decodeMissingTypeThrows() {
+    @Test func decodeMissingTypeDefaultsToStatic() throws {
         let json = """
         {
             "identifier": "com.test.no-type",
@@ -389,8 +389,7 @@ struct ManifestCodingTests {
             "pluginSchemaVersion": "1"
         }
         """
-        #expect(throws: (any Error).self) {
-            try JSONDecoder.piqley.decode(PluginManifest.self, from: Data(json.utf8))
-        }
+        let manifest = try JSONDecoder.piqley.decode(PluginManifest.self, from: Data(json.utf8))
+        #expect(manifest.type == .static)
     }
 }

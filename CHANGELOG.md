@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- `PluginManifest` decoding defaults missing `type` field to `.static` for backward compatibility
 - `PayloadCodingTests` updated for new `debug` parameter on `PluginInputPayload`
 - `ManifestValidator` now rejects `skip` (alongside `original`) as a reserved plugin identifier
 - `RuleEditingContext.stageNames()` now returns stages in canonical pipeline execution order instead of alphabetical

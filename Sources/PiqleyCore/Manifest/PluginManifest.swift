@@ -70,7 +70,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         identifier = try container.decode(String.self, forKey: .identifier)
         name = try container.decode(String.self, forKey: .name)
-        type = try container.decode(PluginType.self, forKey: .type)
+        type = try container.decodeIfPresent(PluginType.self, forKey: .type) ?? .static
         description = try container.decodeIfPresent(String.self, forKey: .description)
         pluginSchemaVersion = try container.decodeIfPresent(String.self, forKey: .pluginSchemaVersion)
             ?? container.decode(String.self, forKey: .pluginProtocolVersion)
