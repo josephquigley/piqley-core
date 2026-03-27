@@ -53,6 +53,7 @@ struct PluginDependencyTests {
         {
             "identifier": "com.test.my-plugin",
             "name": "MyPlugin",
+            "type": "static",
             "pluginSchemaVersion": "1.0",
             "dependencies": [
                 {
@@ -73,6 +74,7 @@ struct PluginDependencyTests {
         {
             "identifier": "com.test.legacy",
             "name": "LegacyPlugin",
+            "type": "static",
             "pluginSchemaVersion": "1.0",
             "dependencies": ["other-plugin", "another"]
         }

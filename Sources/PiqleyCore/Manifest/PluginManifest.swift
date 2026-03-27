@@ -1,9 +1,17 @@
+/// Whether a plugin is pre-compiled (static) or user-created (mutable).
+public enum PluginType: String, Codable, Sendable, Equatable {
+    case `static`
+    case mutable
+}
+
 /// The manifest for a piqley plugin, describing its metadata, configuration, and dependencies.
 public struct PluginManifest: Codable, Sendable, Equatable {
     /// Reverse TLD identifier (e.g. "com.piqley.ghost"). Used as the identity key system-wide.
     public let identifier: String
     /// Human-readable display name.
     public let name: String
+    /// Whether this plugin is static (pre-compiled) or mutable (user-created).
+    public let type: PluginType
     /// Short description of what the plugin does.
     public let description: String?
     public let pluginSchemaVersion: String
@@ -23,6 +31,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
     public init(
         identifier: String,
         name: String,
+        type: PluginType,
         description: String? = nil,
         pluginSchemaVersion: String,
         pluginVersion: SemanticVersion? = nil,
@@ -36,6 +45,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
     ) {
         self.identifier = identifier
         self.name = name
+        self.type = type
         self.description = description
         self.pluginSchemaVersion = pluginSchemaVersion
         self.pluginVersion = pluginVersion
@@ -49,7 +59,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case identifier, name, description
+        case identifier, name, type, description
         case pluginSchemaVersion, pluginProtocolVersion, pluginVersion
         case config, setup, dependencies
         case supportedFormats, conversionFormat, supportedPlatforms
@@ -60,6 +70,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         identifier = try container.decode(String.self, forKey: .identifier)
         name = try container.decode(String.self, forKey: .name)
+        type = try container.decode(PluginType.self, forKey: .type)
         description = try container.decodeIfPresent(String.self, forKey: .description)
         pluginSchemaVersion = try container.decodeIfPresent(String.self, forKey: .pluginSchemaVersion)
             ?? container.decode(String.self, forKey: .pluginProtocolVersion)
@@ -83,6 +94,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(identifier, forKey: .identifier)
         try container.encode(name, forKey: .name)
+        try container.encode(type, forKey: .type)
         try container.encodeIfPresent(description, forKey: .description)
         try container.encode(pluginSchemaVersion, forKey: .pluginSchemaVersion)
         try container.encodeIfPresent(pluginVersion, forKey: .pluginVersion)

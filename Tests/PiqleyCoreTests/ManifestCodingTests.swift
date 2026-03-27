@@ -163,6 +163,7 @@ struct ManifestCodingTests {
         {
             "identifier": "com.test.my-plugin",
             "name": "MyPlugin",
+            "type": "static",
             "description": "A test plugin.",
             "pluginSchemaVersion": "1.0",
             "pluginVersion": "2.3.1",
@@ -177,6 +178,7 @@ struct ManifestCodingTests {
         let manifest = try JSONDecoder.piqley.decode(PluginManifest.self, from: Data(json.utf8))
         #expect(manifest.identifier == "com.test.my-plugin")
         #expect(manifest.name == "MyPlugin")
+        #expect(manifest.type == .static)
         #expect(manifest.description == "A test plugin.")
         #expect(manifest.pluginSchemaVersion == "1.0")
         #expect(manifest.pluginVersion == SemanticVersion(major: 2, minor: 3, patch: 1))
@@ -191,12 +193,14 @@ struct ManifestCodingTests {
         {
             "identifier": "com.test.minimal",
             "name": "MinimalPlugin",
+            "type": "mutable",
             "pluginSchemaVersion": "1.0"
         }
         """
         let manifest = try JSONDecoder.piqley.decode(PluginManifest.self, from: Data(json.utf8))
         #expect(manifest.identifier == "com.test.minimal")
         #expect(manifest.name == "MinimalPlugin")
+        #expect(manifest.type == .mutable)
         #expect(manifest.description == nil)
         #expect(manifest.pluginSchemaVersion == "1.0")
         #expect(manifest.pluginVersion == nil)
@@ -210,6 +214,7 @@ struct ManifestCodingTests {
         {
             "identifier": "com.test.secrets",
             "name": "MyPlugin",
+            "type": "static",
             "pluginSchemaVersion": "1.0",
             "config": [
                 {"key": "apiUrl", "type": "string", "value": "https://example.com"},
@@ -230,6 +235,7 @@ struct ManifestCodingTests {
         {
             "identifier": "com.test.values",
             "name": "MyPlugin",
+            "type": "static",
             "pluginSchemaVersion": "1.0",
             "config": [
                 {"key": "apiUrl", "type": "string", "value": "https://example.com"},
@@ -330,6 +336,7 @@ struct ManifestCodingTests {
         let original = PluginManifest(
             identifier: "com.test.roundtrip",
             name: "TestPlugin",
+            type: .static,
             pluginSchemaVersion: "1.0",
             pluginVersion: SemanticVersion(major: 1, minor: 0, patch: 0),
             config: [.value(key: "url", type: .string, value: .string("http://example.com"), metadata: ConfigMetadata())],
@@ -340,8 +347,50 @@ struct ManifestCodingTests {
         let decoded = try JSONDecoder.piqley.decode(PluginManifest.self, from: data)
         #expect(decoded.identifier == original.identifier)
         #expect(decoded.name == original.name)
+        #expect(decoded.type == original.type)
         #expect(decoded.pluginSchemaVersion == original.pluginSchemaVersion)
         #expect(decoded.pluginVersion == original.pluginVersion)
         #expect(decoded.config.count == original.config.count)
+    }
+
+    // MARK: - PluginType
+
+    @Test func decodeStaticType() throws {
+        let json = """
+        {
+            "identifier": "com.test.static-plugin",
+            "name": "StaticPlugin",
+            "type": "static",
+            "pluginSchemaVersion": "1"
+        }
+        """
+        let manifest = try JSONDecoder.piqley.decode(PluginManifest.self, from: Data(json.utf8))
+        #expect(manifest.type == .static)
+    }
+
+    @Test func decodeMutableType() throws {
+        let json = """
+        {
+            "identifier": "com.test.mutable-plugin",
+            "name": "MutablePlugin",
+            "type": "mutable",
+            "pluginSchemaVersion": "1"
+        }
+        """
+        let manifest = try JSONDecoder.piqley.decode(PluginManifest.self, from: Data(json.utf8))
+        #expect(manifest.type == .mutable)
+    }
+
+    @Test func decodeMissingTypeThrows() {
+        let json = """
+        {
+            "identifier": "com.test.no-type",
+            "name": "NoTypePlugin",
+            "pluginSchemaVersion": "1"
+        }
+        """
+        #expect(throws: (any Error).self) {
+            try JSONDecoder.piqley.decode(PluginManifest.self, from: Data(json.utf8))
+        }
     }
 }

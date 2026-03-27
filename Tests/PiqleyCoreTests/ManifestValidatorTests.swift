@@ -10,6 +10,7 @@ struct ManifestValidatorTests {
     func makeManifest(
         identifier: String = "com.test.my-plugin",
         name: String = "MyPlugin",
+        type: PluginType = .static,
         pluginSchemaVersion: String = "1",
         supportedFormats: [String]? = nil,
         conversionFormat: String? = nil
@@ -17,6 +18,7 @@ struct ManifestValidatorTests {
         PluginManifest(
             identifier: identifier,
             name: name,
+            type: type,
             pluginSchemaVersion: pluginSchemaVersion,
             supportedFormats: supportedFormats,
             conversionFormat: conversionFormat
