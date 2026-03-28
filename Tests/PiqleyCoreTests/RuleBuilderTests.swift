@@ -59,8 +59,8 @@ struct RuleBuilderTests {
 
         let buildResult = builder.build()
         if case .success(let rule) = buildResult {
-            #expect(rule.match.field == "Keywords")
-            #expect(rule.match.pattern == "portrait")
+            #expect(rule.match?.field == "Keywords")
+            #expect(rule.match?.pattern == "portrait")
             #expect(rule.emit.count == 1)
             #expect(rule.write.isEmpty)
         } else {
@@ -76,7 +76,7 @@ struct RuleBuilderTests {
 
         let buildResult = builder.build()
         if case .success(let rule) = buildResult {
-            #expect(rule.match.field == "Keywords")
+            #expect(rule.match?.field == "Keywords")
             #expect(rule.emit.count == 1)
             #expect(rule.write.count == 1)
             #expect(rule.write[0].field == "ISO")
@@ -108,8 +108,14 @@ struct RuleBuilderTests {
         _ = builder.setMatch(field: "", pattern: "portrait")
         _ = builder.addEmit(makeEmit())
 
+        // Match validation failed so match stays nil.
+        // With unconditional rules, nil match is valid, so build succeeds.
         let buildResult = builder.build()
-        #expect(isBuildFailure(buildResult, .noMatch))
+        if case .success(let rule) = buildResult {
+            #expect(rule.match == nil)
+        } else {
+            Issue.record("Expected .success (unconditional rule), got \(buildResult)")
+        }
     }
 
     // MARK: - addEmit validation
@@ -139,13 +145,24 @@ struct RuleBuilderTests {
         #expect(isFailure(result, .unknownAction("explode")))
     }
 
-    // MARK: - build — missing match
+    // MARK: - build — unconditional rules (nil match)
 
-    @Test func buildWithoutMatchFailsNoMatch() {
+    @Test func buildWithoutMatchSucceedsForUnconditionalRule() {
         var builder = RuleBuilder(context: makeContext())
         _ = builder.addEmit(makeEmit())
         let result = builder.build()
-        #expect(isBuildFailure(result, .noMatch))
+        if case .success(let rule) = result {
+            #expect(rule.match == nil)
+            #expect(rule.emit.count == 1)
+        } else {
+            Issue.record("Expected .success for unconditional rule, got \(result)")
+        }
+    }
+
+    @Test func buildWithoutMatchOrActionsFailsNoActions() {
+        var builder = RuleBuilder(context: makeContext())
+        let result = builder.build()
+        #expect(isBuildFailure(result, .noActions))
     }
 
     // MARK: - build — missing actions
@@ -182,7 +199,7 @@ struct RuleBuilderTests {
         builder.reset()
 
         let result = builder.build()
-        #expect(isBuildFailure(result, .noMatch))
+        #expect(isBuildFailure(result, .noActions))
     }
 
     @Test func resetAllowsRebuild() {
@@ -196,7 +213,7 @@ struct RuleBuilderTests {
 
         let result = builder.build()
         if case .success(let rule) = result {
-            #expect(rule.match.field == "ISO")
+            #expect(rule.match?.field == "ISO")
         } else {
             Issue.record("Expected .success after rebuild, got \(result)")
         }
@@ -244,7 +261,7 @@ struct RuleBuilderTests {
 
         let result = builder.build()
         if case .success(let rule) = result {
-            #expect(rule.match.field == "ISO")
+            #expect(rule.match?.field == "ISO")
         } else {
             Issue.record("Expected .success with updated match field, got \(result)")
         }
@@ -260,7 +277,7 @@ struct RuleBuilderTests {
 
         let buildResult = builder.build()
         if case .success(let rule) = buildResult {
-            #expect(rule.match.not == true)
+            #expect(rule.match?.not == true)
         } else {
             Issue.record("Expected .success, got \(buildResult)")
         }
@@ -273,7 +290,7 @@ struct RuleBuilderTests {
 
         let buildResult = builder.build()
         if case .success(let rule) = buildResult {
-            #expect(rule.match.not == nil)
+            #expect(rule.match?.not == nil)
         } else {
             Issue.record("Expected .success, got \(buildResult)")
         }

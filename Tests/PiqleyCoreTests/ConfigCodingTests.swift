@@ -15,8 +15,8 @@ struct ConfigCodingTests {
         }
         """
         let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
-        #expect(rule.match.field == "title")
-        #expect(rule.match.pattern == "^Draft")
+        #expect(rule.match?.field == "title")
+        #expect(rule.match?.pattern == "^Draft")
         #expect(rule.emit[0].field == "status")
         #expect(rule.emit[0].values == ["draft", "wip"])
     }
@@ -29,8 +29,8 @@ struct ConfigCodingTests {
         }
         """
         let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
-        #expect(rule.match.field == "title")
-        #expect(rule.match.pattern == ".*")
+        #expect(rule.match?.field == "title")
+        #expect(rule.match?.pattern == ".*")
         #expect(rule.emit[0].action == nil)
         #expect(rule.emit[0].field == "keywords")
         #expect(rule.emit[0].values == ["any"])
@@ -43,8 +43,8 @@ struct ConfigCodingTests {
         )
         let data = try JSONEncoder.piqley.encode(rule)
         let decoded = try JSONDecoder.piqley.decode(Rule.self, from: data)
-        #expect(decoded.match.field == rule.match.field)
-        #expect(decoded.match.pattern == rule.match.pattern)
+        #expect(decoded.match?.field == rule.match?.field)
+        #expect(decoded.match?.pattern == rule.match?.pattern)
         #expect(decoded.emit[0].field == rule.emit[0].field)
         #expect(decoded.emit[0].values == rule.emit[0].values)
     }
@@ -57,8 +57,34 @@ struct ConfigCodingTests {
         }
         """
         let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
-        #expect(rule.match.field == "title")
-        #expect(rule.match.pattern == "test")
+        #expect(rule.match?.field == "title")
+        #expect(rule.match?.pattern == "test")
+    }
+
+    // MARK: - Unconditional rules (nil match)
+
+    @Test func decodeUnconditionalRule() throws {
+        let json = """
+        {
+            "emit": [{"field": "keywords", "values": ["always"]}]
+        }
+        """
+        let rule = try JSONDecoder.piqley.decode(Rule.self, from: Data(json.utf8))
+        #expect(rule.match == nil)
+        #expect(rule.emit.count == 1)
+        #expect(rule.emit[0].values == ["always"])
+    }
+
+    @Test func encodeRoundTripUnconditionalRule() throws {
+        let rule = Rule(
+            match: nil,
+            emit: [EmitConfig(action: nil, field: "tag", values: ["always"], replacements: nil, source: nil)]
+        )
+        let data = try JSONEncoder.piqley.encode(rule)
+        let decoded = try JSONDecoder.piqley.decode(Rule.self, from: data)
+        #expect(decoded.match == nil)
+        #expect(decoded.emit[0].field == rule.emit[0].field)
+        #expect(decoded.emit[0].values == rule.emit[0].values)
     }
 
     // MARK: - Emit actions
@@ -265,7 +291,7 @@ struct ConfigCodingTests {
         """
         let stage = try JSONDecoder.piqley.decode(StageConfig.self, from: Data(json.utf8))
         #expect(stage.preRules?.count == 1)
-        #expect(stage.preRules?[0].match.field == "original:TIFF:Model")
+        #expect(stage.preRules?[0].match?.field == "original:TIFF:Model")
         #expect(stage.binary?.command == "./bin/my-plugin")
         #expect(stage.binary?.timeout == 60)
         #expect(stage.postRules?.count == 1)

@@ -84,12 +84,9 @@ public struct RuleBuilder: Sendable {
 
     /// Performs a final coherence check and returns a `Rule` on success.
     ///
-    /// Returns `.failure(.noMatch)` if no match has been set.
-    /// Returns `.failure(.noActions)` if no emit actions have been added.
+    /// A nil match produces an unconditional rule that fires for every item.
+    /// Returns `.failure(.noActions)` if no emit or write actions have been added.
     public func build() -> Result<Rule, RuleValidationError> {
-        guard let match else {
-            return .failure(.noMatch)
-        }
         guard !emitActions.isEmpty || !writeActions.isEmpty else {
             return .failure(.noActions)
         }

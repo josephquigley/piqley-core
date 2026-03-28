@@ -21,9 +21,6 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
     /// Fields that should not be set for this action were provided.
     case conflictingFields(action: String)
 
-    /// The match configuration produced no matching results (runtime, not structural).
-    case noMatch
-
     /// The emit array is empty — a rule must have at least one action.
     case noActions
 
@@ -58,8 +55,6 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
             return "The 'clone' action requires a source field reference."
         case .conflictingFields(let action):
             return "Action '\(action)' has conflicting fields that should not be set together."
-        case .noMatch:
-            return "The rule's match configuration did not match any metadata."
         case .noActions:
             return "A rule must have at least one emit action."
         case .skipWithWrite:
@@ -95,8 +90,6 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
             return "Set the 'source' field to a namespace:field reference (e.g. 'exif:Keywords')."
         case .conflictingFields(let action):
             return "Remove fields that are not applicable to the '\(action)' action."
-        case .noMatch:
-            return "Adjust the match pattern so it matches the intended metadata field."
         case .noActions:
             return "Add at least one emit configuration to the rule."
         case .skipWithWrite:
@@ -128,8 +121,6 @@ public enum RuleValidationError: Error, LocalizedError, Sendable, Equatable {
             return true
         case (.conflictingFields(let l), .conflictingFields(let r)):
             return l == r
-        case (.noMatch, .noMatch):
-            return true
         case (.noActions, .noActions):
             return true
         case (.skipWithWrite, .skipWithWrite):

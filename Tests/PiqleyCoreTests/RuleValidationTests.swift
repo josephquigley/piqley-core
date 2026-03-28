@@ -424,18 +424,6 @@ struct RuleValidationTests {
         #expect(!(error.recoverySuggestion!.isEmpty))
     }
 
-    @Test func errorDescriptionNoMatch() {
-        let error = RuleValidationError.noMatch
-        #expect(error.errorDescription != nil)
-        #expect(!(error.errorDescription!.isEmpty))
-    }
-
-    @Test func recoverySuggestionNoMatch() {
-        let error = RuleValidationError.noMatch
-        #expect(error.recoverySuggestion != nil)
-        #expect(!(error.recoverySuggestion!.isEmpty))
-    }
-
     @Test func errorDescriptionNoActions() {
         let error = RuleValidationError.noActions
         #expect(error.errorDescription != nil)

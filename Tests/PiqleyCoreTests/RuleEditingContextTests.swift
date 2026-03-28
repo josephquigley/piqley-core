@@ -157,14 +157,14 @@ struct RuleEditingContextTests {
         let ctx = makeContext()
         let rules = ctx.rules(forStage: "ingest", slot: .pre)
         #expect(rules.count == 1)
-        #expect(rules[0].match.field == "Keywords")
+        #expect(rules[0].match?.field == "Keywords")
     }
 
     @Test func rulesForStagePostSlotReturnsPostRules() {
         let ctx = makeContext()
         let rules = ctx.rules(forStage: "ingest", slot: .post)
         #expect(rules.count == 1)
-        #expect(rules[0].match.field == "ISO")
+        #expect(rules[0].match?.field == "ISO")
     }
 
     @Test func rulesForEmptySlotReturnsEmptyArray() {
