@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `ImageOutcome` enum (`success`, `failure`, `warning`, `skip`) for per-image plugin results
+- `status: ImageOutcome?` field on `PluginOutputLine` for `imageResult` lines
 - `ConsumedField.readOnly` flag to indicate fields that cannot be targeted by emit/write actions
 - `FieldInfo.readOnly` flag; catalog fields from `MetadataFieldCatalog` are marked read-only
 - `PluginType` enum (`static`, `mutable`) to distinguish pre-compiled from user-created plugins

@@ -6,8 +6,10 @@ public struct PluginOutputLine: Codable, Sendable, Equatable {
     public let message: String?
     /// The filename associated with this output (for image results).
     public let filename: String?
-    /// Whether the operation succeeded.
+    /// Whether the operation succeeded (used by "result" lines).
     public let success: Bool?
+    /// The outcome of processing this image (used by "imageResult" lines).
+    public let status: ImageOutcome?
     /// An error message if the operation failed.
     public let error: String?
     /// State to persist, keyed by folder path then key.
@@ -18,6 +20,7 @@ public struct PluginOutputLine: Codable, Sendable, Equatable {
         message: String? = nil,
         filename: String? = nil,
         success: Bool? = nil,
+        status: ImageOutcome? = nil,
         error: String? = nil,
         state: [String: [String: JSONValue]]? = nil
     ) {
@@ -25,6 +28,7 @@ public struct PluginOutputLine: Codable, Sendable, Equatable {
         self.message = message
         self.filename = filename
         self.success = success
+        self.status = status
         self.error = error
         self.state = state
     }

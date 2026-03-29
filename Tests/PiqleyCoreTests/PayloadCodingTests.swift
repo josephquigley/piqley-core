@@ -126,20 +126,38 @@ struct PayloadCodingTests {
         #expect(line.success == nil)
     }
 
-    @Test func decodeOutputLineImageResult() throws {
-        let json = #"{"type": "imageResult", "filename": "photo.jpg", "success": true}"#
+    @Test func decodeOutputLineImageResultSuccess() throws {
+        let json = #"{"type": "imageResult", "filename": "photo.jpg", "status": "success"}"#
         let line = try JSONDecoder.piqley.decode(PluginOutputLine.self, from: Data(json.utf8))
         #expect(line.type == "imageResult")
         #expect(line.filename == "photo.jpg")
-        #expect(line.success == true)
+        #expect(line.status == .success)
     }
 
-    @Test func decodeOutputLineImageResultWithError() throws {
-        let json = #"{"type": "imageResult", "filename": "bad.jpg", "success": false, "error": "File not found"}"#
+    @Test func decodeOutputLineImageResultFailure() throws {
+        let json = #"{"type": "imageResult", "filename": "bad.jpg", "status": "failure", "error": "File not found"}"#
         let line = try JSONDecoder.piqley.decode(PluginOutputLine.self, from: Data(json.utf8))
         #expect(line.type == "imageResult")
         #expect(line.filename == "bad.jpg")
-        #expect(line.success == false)
+        #expect(line.status == .failure)
         #expect(line.error == "File not found")
+    }
+
+    @Test func decodeOutputLineImageResultWarning() throws {
+        let json = #"{"type": "imageResult", "filename": "dim.jpg", "status": "warning", "error": "low resolution"}"#
+        let line = try JSONDecoder.piqley.decode(PluginOutputLine.self, from: Data(json.utf8))
+        #expect(line.type == "imageResult")
+        #expect(line.filename == "dim.jpg")
+        #expect(line.status == .warning)
+        #expect(line.error == "low resolution")
+    }
+
+    @Test func decodeOutputLineImageResultSkip() throws {
+        let json = #"{"type": "imageResult", "filename": "raw.cr3", "status": "skip", "error": "not a supported format"}"#
+        let line = try JSONDecoder.piqley.decode(PluginOutputLine.self, from: Data(json.utf8))
+        #expect(line.type == "imageResult")
+        #expect(line.filename == "raw.cr3")
+        #expect(line.status == .skip)
+        #expect(line.error == "not a supported format")
     }
 }
