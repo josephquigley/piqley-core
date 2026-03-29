@@ -21,14 +21,14 @@ struct RuleEditingContextTests {
     private func makeContext() -> RuleEditingContext {
         let fields: [String: [FieldInfo]] = [
             "exif": [
-                FieldInfo(name: "ISO", source: "exif", category: .exif),
-                FieldInfo(name: "Aperture", source: "exif", category: .exif),
+                FieldInfo(name: "ISO", source: "exif", category: .exif, readOnly: false),
+                FieldInfo(name: "Aperture", source: "exif", category: .exif, readOnly: false),
             ],
             "iptc": [
-                FieldInfo(name: "Keywords", source: "iptc", category: .iptc),
+                FieldInfo(name: "Keywords", source: "iptc", category: .iptc, readOnly: false),
             ],
             "custom": [
-                FieldInfo(name: "Rating", source: "custom", category: .custom),
+                FieldInfo(name: "Rating", source: "custom", category: .custom, readOnly: false),
             ],
         ]
         let stages: [String: StageConfig] = [
@@ -89,9 +89,9 @@ struct RuleEditingContextTests {
     @Test func fieldsInKnownSourceReturnsSortedByCategoryThenName() {
         let fields: [String: [FieldInfo]] = [
             "mixed": [
-                FieldInfo(name: "Zebra", source: "exif", category: .exif),
-                FieldInfo(name: "Alpha", source: "iptc", category: .iptc),
-                FieldInfo(name: "Middle", source: "exif", category: .exif),
+                FieldInfo(name: "Zebra", source: "exif", category: .exif, readOnly: false),
+                FieldInfo(name: "Alpha", source: "iptc", category: .iptc, readOnly: false),
+                FieldInfo(name: "Middle", source: "exif", category: .exif, readOnly: false),
             ]
         ]
         let ctx = RuleEditingContext(

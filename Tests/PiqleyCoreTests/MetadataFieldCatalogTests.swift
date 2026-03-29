@@ -112,16 +112,17 @@ struct MetadataFieldCatalogTests {
 
     @Test("FieldInfo convenience init builds qualifiedName from source and name")
     func fieldInfoQualifiedName() {
-        let field = FieldInfo(name: "ISO", source: "exif", category: .exif)
+        let field = FieldInfo(name: "ISO", source: "exif", category: .exif, readOnly: false)
         #expect(field.qualifiedName == "exif:ISO")
         #expect(field.name == "ISO")
         #expect(field.source == "exif")
         #expect(field.category == .exif)
+        #expect(field.readOnly == false)
     }
 
     @Test("FieldInfo full init uses explicit qualifiedName")
     func fieldInfoFullInit() {
-        let field = FieldInfo(name: "ISO", source: "exif", qualifiedName: "EXIF:ISO", category: .exif)
+        let field = FieldInfo(name: "ISO", source: "exif", qualifiedName: "EXIF:ISO", category: .exif, readOnly: false)
         #expect(field.qualifiedName == "EXIF:ISO")
         #expect(field.source == "exif")
         #expect(field.category == .exif)
@@ -129,10 +130,20 @@ struct MetadataFieldCatalogTests {
 
     @Test("FieldInfo for plugin source has custom category")
     func fieldInfoPluginSource() {
-        let field = FieldInfo(name: "MyField", source: "exif-tagger", category: .custom)
+        let field = FieldInfo(name: "MyField", source: "exif-tagger", category: .custom, readOnly: false)
         #expect(field.category == .custom)
         #expect(field.source == "exif-tagger")
         #expect(field.qualifiedName == "exif-tagger:MyField")
+    }
+
+    @Test("Catalog fields are readOnly")
+    func catalogFieldsAreReadOnly() {
+        for source in ["exif", "iptc", "xmp", "tiff"] {
+            let result = MetadataFieldCatalog.fields(forSource: source)
+            for field in result {
+                #expect(field.readOnly == true)
+            }
+        }
     }
 
     @Test("FieldInfo catalog exif fields have .exif category")

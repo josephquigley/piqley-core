@@ -148,7 +148,8 @@ public enum MetadataFieldCatalog {
                     name: name,
                     source: source,
                     qualifiedName: "\(entry.prefix):\(name)",
-                    category: entry.category
+                    category: entry.category,
+                    readOnly: true
                 )
             }
     }

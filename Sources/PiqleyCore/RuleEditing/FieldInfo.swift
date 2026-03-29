@@ -26,20 +26,24 @@ public struct FieldInfo: Sendable, Equatable {
     public let qualifiedName: String
     /// Display/sort category for grouping fields in the rule editor wizard.
     public let category: FieldCategory
+    /// Whether this field is read-only (cannot be targeted by emit/write actions).
+    public let readOnly: Bool
 
     /// Full initialiser with explicit qualifiedName.
-    public init(name: String, source: String, qualifiedName: String, category: FieldCategory) {
+    public init(name: String, source: String, qualifiedName: String, category: FieldCategory, readOnly: Bool) {
         self.name = name
         self.source = source
         self.qualifiedName = qualifiedName
         self.category = category
+        self.readOnly = readOnly
     }
 
     /// Convenience initialiser that derives `qualifiedName` as `"\(source):\(name)"`.
-    public init(name: String, source: String, category: FieldCategory) {
+    public init(name: String, source: String, category: FieldCategory, readOnly: Bool) {
         self.name = name
         self.source = source
         self.qualifiedName = "\(source):\(name)"
         self.category = category
+        self.readOnly = readOnly
     }
 }
