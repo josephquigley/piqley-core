@@ -362,4 +362,43 @@ struct ConfigCodingTests {
         )
         #expect(!notEmpty.isEmpty)
     }
+
+    // MARK: - isEffectivelyEmpty
+
+    @Test func isEffectivelyEmptyWhenAllNil() {
+        let stage = StageConfig()
+        #expect(stage.isEffectivelyEmpty)
+    }
+
+    @Test func isEffectivelyEmptyWithEmptyCommandBinary() {
+        let stage = StageConfig(binary: HookConfig(command: ""))
+        #expect(stage.isEffectivelyEmpty)
+    }
+
+    @Test func isEffectivelyEmptyWithNilCommandBinary() {
+        let stage = StageConfig(binary: HookConfig(command: nil))
+        #expect(stage.isEffectivelyEmpty)
+    }
+
+    @Test func isNotEffectivelyEmptyWithRealCommand() {
+        let stage = StageConfig(binary: HookConfig(command: "./bin/tool"))
+        #expect(!stage.isEffectivelyEmpty)
+    }
+
+    @Test func isNotEffectivelyEmptyWithPreRules() {
+        let rule = Rule(match: MatchConfig(field: "x", pattern: "y"), emit: [])
+        let stage = StageConfig(preRules: [rule])
+        #expect(!stage.isEffectivelyEmpty)
+    }
+
+    @Test func isNotEffectivelyEmptyWithPostRules() {
+        let rule = Rule(match: MatchConfig(field: "x", pattern: "y"), emit: [])
+        let stage = StageConfig(postRules: [rule])
+        #expect(!stage.isEffectivelyEmpty)
+    }
+
+    @Test func isEffectivelyEmptyWithEmptyRuleArrays() {
+        let stage = StageConfig(preRules: [], postRules: [])
+        #expect(stage.isEffectivelyEmpty)
+    }
 }

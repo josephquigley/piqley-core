@@ -183,4 +183,16 @@ struct StageConfigMutationTests {
             try stage.replaceRule(at: 5, with: makeRule(field: "new"), slot: .pre)
         }
     }
+
+    // MARK: - RuleSlotError descriptions
+
+    @Test func emptySlotErrorDescription() {
+        let error = RuleSlotError.emptySlot
+        #expect(error.errorDescription == "The rule slot is empty.")
+    }
+
+    @Test func indexOutOfBoundsErrorDescription() {
+        let error = RuleSlotError.indexOutOfBounds
+        #expect(error.errorDescription == "The index is out of bounds for this rule slot.")
+    }
 }

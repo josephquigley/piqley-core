@@ -74,6 +74,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `Rule.match` is now optional (`MatchConfig?`). A nil match creates an unconditional rule that fires for every item
 - `RuleBuilder.build()` no longer requires a match configuration
 - Removed `.noMatch` case from `RuleValidationError`
+- Removed fluff test suites (`HookTests`, `HookConfigTests`, `ConfigValueTypeTests`) that only verified enum raw values and trivial Codable round-trips
+- Added tests for `StageConfig.isEffectivelyEmpty`, `ConsumedField` decoding, `RuleSlotError` error descriptions, and `JSONEncoder.piqleyPrettyPrint`
 - **BREAKING:** `Hook` is now a protocol instead of an enum. The 6 built-in hooks move to `StandardHook`. All references to `Hook.canonicalOrder`, `Hook.defaultStageNames`, and `Hook.allCases` must use `StandardHook` instead.
 - Reverted `supportedSchemaVersions` back to `["1"]`; no version bump needed without production consumers
 - Renamed `pluginProtocolVersion` to `pluginSchemaVersion` with version validation
