@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `ConsumedField.readOnly` flag to indicate fields that cannot be targeted by emit/write actions
 - `PluginType` enum (`static`, `mutable`) to distinguish pre-compiled from user-created plugins
 - Required `type` field on `PluginManifest` with full coding support
 - `debug` property on `PluginInputPayload` for forwarding the CLI `--debug` flag to plugins
