@@ -23,7 +23,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
     public let conversionFormat: String?
     public let supportedPlatforms: [String]?
     /// State fields this plugin declares it works with.
-    public let consumedFields: [ConsumedField]
+    public let fields: [ConsumedField]
 
     /// The set of schema versions this build of PiqleyCore supports.
     public static let supportedSchemaVersions: Set<String> = ["1"]
@@ -41,7 +41,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         supportedFormats: [String]? = nil,
         conversionFormat: String? = nil,
         supportedPlatforms: [String]? = nil,
-        consumedFields: [ConsumedField] = []
+        fields: [ConsumedField] = []
     ) {
         self.identifier = identifier
         self.name = name
@@ -55,7 +55,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         self.supportedFormats = supportedFormats
         self.conversionFormat = conversionFormat
         self.supportedPlatforms = supportedPlatforms
-        self.consumedFields = consumedFields
+        self.fields = fields
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -63,7 +63,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         case pluginSchemaVersion, pluginProtocolVersion, pluginVersion
         case config, setup, dependencies
         case supportedFormats, conversionFormat, supportedPlatforms
-        case consumedFields
+        case fields
     }
 
     public init(from decoder: any Decoder) throws {
@@ -87,7 +87,7 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         supportedPlatforms = try container.decodeIfPresent([String].self, forKey: .supportedPlatforms)
         supportedFormats = try container.decodeIfPresent([String].self, forKey: .supportedFormats)
         conversionFormat = try container.decodeIfPresent(String.self, forKey: .conversionFormat)
-        consumedFields = try container.decodeIfPresent([ConsumedField].self, forKey: .consumedFields) ?? []
+        fields = try container.decodeIfPresent([ConsumedField].self, forKey: .fields) ?? []
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -104,8 +104,8 @@ public struct PluginManifest: Codable, Sendable, Equatable {
         try container.encodeIfPresent(supportedPlatforms, forKey: .supportedPlatforms)
         try container.encodeIfPresent(supportedFormats, forKey: .supportedFormats)
         try container.encodeIfPresent(conversionFormat, forKey: .conversionFormat)
-        if !consumedFields.isEmpty {
-            try container.encode(consumedFields, forKey: .consumedFields)
+        if !fields.isEmpty {
+            try container.encode(fields, forKey: .fields)
         }
     }
 

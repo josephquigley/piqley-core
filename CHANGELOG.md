@@ -70,6 +70,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- **Breaking:** `PluginManifest.consumedFields` renamed to `fields`
 - `Rule.match` is now optional (`MatchConfig?`). A nil match creates an unconditional rule that fires for every item
 - `RuleBuilder.build()` no longer requires a match configuration
 - Removed `.noMatch` case from `RuleValidationError`
