@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- `PluginFile.versionState` constant for the filename that persists the last successfully executed plugin version
 - Optional `hook` field on `StageEntry` for aliasing custom stages to plugin-recognized hooks
 - `StageRegistry.resolvedHook(for:)` query that returns the alias when set, or the stage name when unset
 - `ImageOutcome` enum (`success`, `failure`, `warning`, `skip`) for per-image plugin results

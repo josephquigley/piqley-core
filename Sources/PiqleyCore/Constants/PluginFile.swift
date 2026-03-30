@@ -3,6 +3,8 @@ public enum PluginFile {
     public static let manifest = "manifest.json"
     public static let config = "config.json"
     public static let executionLog = "logs/execution.jsonl"
+    /// File that persists the last successfully executed plugin version.
+    public static let versionState = "version-state.json"
     /// Prefix for stage configuration files (e.g. "stage-pre-process.json").
     public static let stagePrefix = "stage-"
     /// Suffix for stage configuration files.
