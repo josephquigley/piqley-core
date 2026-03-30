@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- `StageConfig` lossy decoder silently skips comment-only objects in `preRules`/`postRules` arrays instead of failing the entire stage
 - `PluginManifest` decoding defaults missing `type` field to `.static` for backward compatibility
 - `PayloadCodingTests` updated for new `debug` parameter on `PluginInputPayload`
 - `ManifestValidator` now rejects `skip` (alongside `original`) as a reserved plugin identifier
