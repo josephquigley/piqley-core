@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+### Removed
+
+- `fork` field from `HookConfig` (image forking shelved, preserved on `research/image-forking`)
+
 ### Fixed
 
 - `StageConfig` lossy decoder silently skips comment-only objects in `preRules`/`postRules` arrays instead of failing the entire stage
