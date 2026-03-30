@@ -2,9 +2,11 @@ import Foundation
 
 public struct StageEntry: Codable, Sendable, Equatable {
     public var name: String
+    public var hook: String?
 
-    public init(name: String) {
+    public init(name: String, hook: String? = nil) {
         self.name = name
+        self.hook = hook
     }
 }
 
@@ -54,6 +56,14 @@ public struct StageRegistry: Codable, Sendable {
 
     public var executionOrder: [String] {
         active.map(\.name)
+    }
+
+    public func resolvedHook(for stage: String) -> String {
+        if let entry = active.first(where: { $0.name == stage }),
+           let hook = entry.hook {
+            return hook
+        }
+        return stage
     }
 
     // MARK: - Validation

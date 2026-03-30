@@ -163,4 +163,37 @@ struct StageRegistryTests {
         #expect(!StageRegistry.isValidName("has spaces"))
         #expect(!StageRegistry.isValidName("a")) // minimum 2 chars
     }
+
+    @Test func stageEntryRoundTripsWithHook() throws {
+        var registry = try StageRegistry.load(from: tempDir)
+        registry.active.append(StageEntry(name: "publish-365", hook: "publish"))
+        try registry.save(to: tempDir)
+        let reloaded = try StageRegistry.load(from: tempDir)
+        let entry = reloaded.active.first(where: { $0.name == "publish-365" })
+        #expect(entry?.hook == "publish")
+    }
+
+    @Test func stageEntryRoundTripsWithoutHook() throws {
+        var registry = try StageRegistry.load(from: tempDir)
+        try registry.save(to: tempDir)
+        let reloaded = try StageRegistry.load(from: tempDir)
+        let entry = reloaded.active.first(where: { $0.name == "publish" })
+        #expect(entry?.hook == nil)
+    }
+
+    @Test func resolvedHookReturnsAliasWhenSet() throws {
+        var registry = try StageRegistry.load(from: tempDir)
+        registry.active.append(StageEntry(name: "publish-365", hook: "publish"))
+        #expect(registry.resolvedHook(for: "publish-365") == "publish")
+    }
+
+    @Test func resolvedHookReturnsStageNameWhenNoAlias() throws {
+        let registry = try StageRegistry.load(from: tempDir)
+        #expect(registry.resolvedHook(for: "publish") == "publish")
+    }
+
+    @Test func resolvedHookReturnsStageNameForUnknownStage() throws {
+        let registry = try StageRegistry.load(from: tempDir)
+        #expect(registry.resolvedHook(for: "nonexistent") == "nonexistent")
+    }
 }
