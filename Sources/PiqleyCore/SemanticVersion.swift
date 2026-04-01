@@ -1,6 +1,17 @@
+import Foundation
+
 /// An error that can be thrown when parsing a semantic version string.
 public enum SemanticVersionError: Error, Equatable {
     case invalidFormat
+}
+
+extension SemanticVersionError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .invalidFormat:
+            return "Invalid semantic version format. Expected a version like '1.2.3' or '1.2'."
+        }
+    }
 }
 
 /// A semantic version number (major.minor.patch).
