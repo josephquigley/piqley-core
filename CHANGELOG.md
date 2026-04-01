@@ -96,6 +96,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Removed `hook` from `MatchConfig` — stage files imply the hook
 - Removed `rules` from `PluginConfig`
 - Removed redundant `schedule` hook
+- StageRegistry.load and .save accept FileSystemManager parameter
 
 ## [0.2.0] - 2026-03-18
 

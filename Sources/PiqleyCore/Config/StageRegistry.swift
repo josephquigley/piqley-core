@@ -24,24 +24,24 @@ public struct StageRegistry: Codable, Sendable {
 
     // MARK: - Persistence
 
-    public static func load(from directory: URL) throws -> StageRegistry {
+    public static func load(from directory: URL, fileManager: any FileSystemManager = FileManager.default) throws -> StageRegistry {
         let file = directory.appendingPathComponent(fileName)
-        guard FileManager.default.fileExists(atPath: file.path) else {
+        guard fileManager.fileExists(atPath: file.path) else {
             let seeded = StageRegistry(
                 active: StandardHook.defaultStageNames.map { StageEntry(name: $0) },
                 available: []
             )
-            try seeded.save(to: directory)
+            try seeded.save(to: directory, fileManager: fileManager)
             return seeded
         }
-        let data = try Data(contentsOf: file)
+        let data = try fileManager.contents(of: file)
         return try JSONDecoder.piqley.decode(StageRegistry.self, from: data)
     }
 
-    public func save(to directory: URL) throws {
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    public func save(to directory: URL, fileManager: any FileSystemManager = FileManager.default) throws {
+        try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
         let data = try JSONEncoder.piqleyPrettyPrint.encode(self)
-        try data.write(to: directory.appendingPathComponent(Self.fileName), options: .atomic)
+        try fileManager.write(data, to: directory.appendingPathComponent(Self.fileName), options: .atomic)
     }
 
     // MARK: - Queries

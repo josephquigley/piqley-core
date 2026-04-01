@@ -4,29 +4,25 @@ import Testing
 
 @Suite("StageRegistry")
 struct StageRegistryTests {
-    let tempDir = FileManager.default.temporaryDirectory
-        .appendingPathComponent("piqley-registry-\(UUID().uuidString)")
-
-    init() throws {
-        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
-    }
+    let fm = InMemoryFileManager()
+    let tempDir = URL(fileURLWithPath: "/test/registry")
 
     @Test func seedsDefaultsWhenFileMissing() throws {
-        let registry = try StageRegistry.load(from: tempDir)
+        let registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         #expect(registry.active.map(\.name) == StandardHook.defaultStageNames)
         #expect(registry.available.isEmpty)
     }
 
     @Test func roundTrips() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         registry.available.append(StageEntry(name: "publish-356"))
-        try registry.save(to: tempDir)
-        let reloaded = try StageRegistry.load(from: tempDir)
+        try registry.save(to: tempDir, fileManager: fm)
+        let reloaded = try StageRegistry.load(from: tempDir, fileManager: fm)
         #expect(reloaded.available.map(\.name) == ["publish-356"])
     }
 
     @Test func isKnownChecksActivePlusAvailable() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         registry.available.append(StageEntry(name: "custom"))
         #expect(registry.isKnown("pre-process"))
         #expect(registry.isKnown("custom"))
@@ -36,7 +32,7 @@ struct StageRegistryTests {
     // MARK: - Mutations
 
     @Test func activateMovesFromAvailableToActive() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         registry.available.append(StageEntry(name: "custom"))
         try registry.activate("custom", at: 2)
         #expect(registry.active[2].name == "custom")
@@ -44,55 +40,55 @@ struct StageRegistryTests {
     }
 
     @Test func deactivateMovesFromActiveToAvailable() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         try registry.deactivate("pre-process")
         #expect(!registry.active.map(\.name).contains("pre-process"))
         #expect(registry.available.map(\.name).contains("pre-process"))
     }
 
     @Test func reorderMovesStageTo() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         try registry.reorder("publish", to: 1)
         #expect(registry.active[1].name == "publish")
     }
 
     @Test func addStageInsertsAtPosition() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         try registry.addStage("custom-stage", at: 2)
         #expect(registry.active[2].name == "custom-stage")
         #expect(registry.active.count == 7)
     }
 
     @Test func addStageDuplicateNameThrows() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         #expect(throws: StageRegistryError.self) {
             try registry.addStage("pre-process", at: 0)
         }
     }
 
     @Test func addStageInvalidNameThrows() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         #expect(throws: StageRegistryError.self) {
             try registry.addStage("Bad Name", at: 0)
         }
     }
 
     @Test func removeStageDeletesFromBothLists() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         registry.available.append(StageEntry(name: "custom"))
         try registry.removeStage("custom")
         #expect(!registry.isKnown("custom"))
     }
 
     @Test func renameStageUpdatesName() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         try registry.renameStage("publish", to: "publish-photos")
         #expect(registry.active.map(\.name).contains("publish-photos"))
         #expect(!registry.active.map(\.name).contains("publish"))
     }
 
     @Test func renameToExistingNameThrows() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         #expect(throws: StageRegistryError.self) {
             try registry.renameStage("publish", to: "pre-process")
         }
@@ -101,7 +97,7 @@ struct StageRegistryTests {
     // MARK: - Required Stage Protection
 
     @Test func deactivateRequiredStageThrows() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         #expect(throws: StageRegistryError.self) {
             try registry.deactivate("pipeline-start")
         }
@@ -114,7 +110,7 @@ struct StageRegistryTests {
     }
 
     @Test func removeRequiredStageThrows() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         #expect(throws: StageRegistryError.self) {
             try registry.removeStage("pipeline-start")
         }
@@ -126,7 +122,7 @@ struct StageRegistryTests {
     }
 
     @Test func renameRequiredStageThrows() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         #expect(throws: StageRegistryError.self) {
             try registry.renameStage("pipeline-start", to: "my-start")
         }
@@ -146,7 +142,7 @@ struct StageRegistryTests {
     }
 
     @Test func autoRegisterAddsToAvailable() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         registry.autoRegister("new-stage")
         #expect(registry.available.map(\.name).contains("new-stage"))
         // No-op for existing
@@ -165,35 +161,35 @@ struct StageRegistryTests {
     }
 
     @Test func stageEntryRoundTripsWithHook() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         registry.active.append(StageEntry(name: "publish-365", hook: "publish"))
-        try registry.save(to: tempDir)
-        let reloaded = try StageRegistry.load(from: tempDir)
+        try registry.save(to: tempDir, fileManager: fm)
+        let reloaded = try StageRegistry.load(from: tempDir, fileManager: fm)
         let entry = reloaded.active.first(where: { $0.name == "publish-365" })
         #expect(entry?.hook == "publish")
     }
 
     @Test func stageEntryRoundTripsWithoutHook() throws {
-        var registry = try StageRegistry.load(from: tempDir)
-        try registry.save(to: tempDir)
-        let reloaded = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
+        try registry.save(to: tempDir, fileManager: fm)
+        let reloaded = try StageRegistry.load(from: tempDir, fileManager: fm)
         let entry = reloaded.active.first(where: { $0.name == "publish" })
         #expect(entry?.hook == nil)
     }
 
     @Test func resolvedHookReturnsAliasWhenSet() throws {
-        var registry = try StageRegistry.load(from: tempDir)
+        var registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         registry.active.append(StageEntry(name: "publish-365", hook: "publish"))
         #expect(registry.resolvedHook(for: "publish-365") == "publish")
     }
 
     @Test func resolvedHookReturnsStageNameWhenNoAlias() throws {
-        let registry = try StageRegistry.load(from: tempDir)
+        let registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         #expect(registry.resolvedHook(for: "publish") == "publish")
     }
 
     @Test func resolvedHookReturnsStageNameForUnknownStage() throws {
-        let registry = try StageRegistry.load(from: tempDir)
+        let registry = try StageRegistry.load(from: tempDir, fileManager: fm)
         #expect(registry.resolvedHook(for: "nonexistent") == "nonexistent")
     }
 }
