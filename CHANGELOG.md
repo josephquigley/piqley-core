@@ -78,6 +78,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Stage file constants in `PluginConfig`
 - `write` array on `Rule` for metadata write actions
 - `action` and `replacements` on `EmitConfig`; `Rule.emit` as array
+- FileSystemManager protocol, FileManager conformance, and InMemoryFileManager shim
 
 ### Changed
 
