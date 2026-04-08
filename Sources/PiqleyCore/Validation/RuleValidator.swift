@@ -4,6 +4,7 @@ import Foundation
 public enum RuleValidator {
 
     /// The complete set of supported emit action strings.
+    /// Note: "writeBack" is designed for image forking (not yet implemented).
     public static let validActions: Set<String> = ["add", "remove", "replace", "removeField", "clone", "skip", "writeBack"]
 
     // MARK: - validateMatch
